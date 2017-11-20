@@ -19,6 +19,52 @@ dependencies {
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.20.1'
 }
 
+task createTaskDatabase {
+    delete 'build/resources/main/tasks.db'
+    def databaseFile = file("build/resources/main/tasks.db")
+    outputs.file(databaseFile)
+    doLast {
+        def db = openSQLiteDatabase(databaseFile)
+        db.execute("""CREATE TABLE tasks (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	name varchar(255) NOT NULL,
+        	description text,
+        	effort_estimate datetime NOT NULL
+        );""")
+
+        db.execute("""CREATE TABLE prereq_tasks (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	this_task_ID integer NOT NULL,
+        	prereq_task_ID integer NOT NULL,
+          FOREIGN KEY(this_task_ID) REFERENCES tasks(ID) ON DELETE CASCADE,
+          FOREIGN KEY(prereq_task_ID) REFERENCES tasks(ID) ON DELETE CASCADE
+        );""")
+
+        db.execute("""CREATE TABLE schedule (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	task_id integer NOT NULL,
+        	time datetime NOT NULL,
+          FOREIGN KEY(task_ID) REFERENCES tasks(ID) ON DELETE CASCADE
+        );""")
+
+        db.execute("""CREATE TABLE people (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	first_name varchar(30) NOT NULL,
+        	last_name varchar(30) NOT NULL
+        );""")
+
+        db.execute("""CREATE TABLE people_to_tasks (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	person_id integer NOT NULL,
+        	task_id integer NOT NULL,
+          FOREIGN KEY(person_id) REFERENCES people(ID) ON DELETE CASCADE,
+          FOREIGN KEY(task_ID) REFERENCES tasks(ID) ON DELETE CASCADE
+        );""")
+    }
+}
+
+tasks.build.dependsOn(createTaskDatabase)
+
 task createTestDatabase {
     delete 'build/resources/test/test.db'
     def databaseFile = file("build/resources/test/test.db")
