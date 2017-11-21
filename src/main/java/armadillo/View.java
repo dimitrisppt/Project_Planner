@@ -19,6 +19,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.swing.text.StyledEditorKit;
 import java.awt.*;
 
 public class View extends Application{
@@ -163,6 +164,7 @@ public class View extends Application{
 			public void handle(ActionEvent event) {
 
 				Button submit = new Button("Submit");
+				submit.setStyle("-fx-font-weight: bold");
 
 				Label personInstructions = new Label("Select people to assign to task.");
 				Label taskInstructions = new Label("Select prerequisite tasks or delete pre-existing tasks.");
@@ -171,18 +173,45 @@ public class View extends Application{
 				Label blankLabel = new Label();
 				TextField resourcesField = new TextField();
 				
-				Label taskLabel = new Label("Task Name: ");
+				Label taskLabel = new Label("Task Name:");
+				taskLabel.setStyle("-fx-font-weight: bold");
 		        // taskLabel.setAlignment(Pos.TOP_LEFT);
 
 		        TextField taskField = new TextField();
 		        //taskField.setAlignment(Pos.TOP_CENTER);
 		        taskField.setMaxSize(200,25);
 
-		        Label taskDescription = new Label("Task Description: ");
+		        Label taskDescription = new Label("Task Description:");
+		        taskDescription.setStyle("-fx-font-weight: bold");
 
 		        TextField descriptionField = new TextField();
 				descriptionField.setMaxSize(200,100);
 
+				Label spinnerLabelHours = new Label("Hours:");
+				Label spinnerLabelMins = new Label("Minutes:");
+
+				Spinner<Integer> spinnerHours = new Spinner<Integer>();
+				int initialValueHours = 1;
+				SpinnerValueFactory<Integer> valueFactoryHours = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueHours);
+
+				Spinner<Integer> spinnerMins = new Spinner<Integer>();
+				int initialValueMins = 0;
+				SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueHours);
+
+				spinnerHours.setValueFactory(valueFactoryHours);
+				spinnerMins.setValueFactory(valueFactoryMins);
+				spinnerHours.setMaxWidth(50);
+				spinnerMins.setMaxWidth(50);
+
+				Label effortLabel = new Label("Effort Estimate:");
+				effortLabel.setStyle("-fx-font-weight: bold");
+				HBox spinnerHBox = new HBox(10);
+				spinnerHBox.setPadding(new Insets(25,25,25,25));
+				spinnerHBox.setPadding(new Insets(0, 0, 25, 0));
+				spinnerHBox.setAlignment(Pos.CENTER);
+				spinnerHBox.getChildren().add(effortLabel);
+				spinnerHBox.getChildren().addAll(spinnerLabelHours, spinnerHours);
+				spinnerHBox.getChildren().addAll(spinnerLabelMins, spinnerMins);
 
 
 				ObservableList<String> people = FXCollections.observableArrayList (
@@ -233,6 +262,11 @@ public class View extends Application{
 				dialogHbox.getChildren().add(taskDescription);
 		        dialogHbox.getChildren().add(descriptionField);
 
+		        VBox headerVBox = new VBox();
+		        headerVBox.getChildren().add(dialogHbox);
+		        headerVBox.getChildren().add(spinnerHBox);
+
+
 		        BorderPane buttonPane = new BorderPane();
 		        buttonPane.setRight(submit);
 				borderPane.setBottom(buttonPane);
@@ -241,7 +275,7 @@ public class View extends Application{
 				borderPane.setCenter(taskVbox);
 				borderPane.setRight(resourcesVbox);
 
-				borderPane.setTop(dialogHbox);
+				borderPane.setTop(headerVBox);
 
 				borderPane.setPadding(new Insets(25,25,25,25));
 		        
