@@ -29,7 +29,7 @@ task createTaskDatabase {
         	ID integer PRIMARY KEY AUTOINCREMENT,
         	name varchar(255) NOT NULL,
         	description text,
-        	effort_estimate datetime NOT NULL
+        	effort_estimate integer NOT NULL
         );""")
 
         db.execute("""CREATE TABLE prereq_tasks (
@@ -43,7 +43,7 @@ task createTaskDatabase {
         db.execute("""CREATE TABLE schedule (
         	ID integer PRIMARY KEY AUTOINCREMENT,
         	task_id integer NOT NULL,
-        	time datetime NOT NULL,
+        	time integer NOT NULL,
           FOREIGN KEY(task_id) REFERENCES tasks(ID) ON DELETE CASCADE
         );""")
 
