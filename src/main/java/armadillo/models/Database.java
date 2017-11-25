@@ -3,11 +3,11 @@ package armadillo.models;
 import java.sql.*;
 
 public class Database {
-    public final String URL = "jdbc:sqlite:build/resources/test/test.db";
+    public final static String URL = "jdbc:sqlite:build/resources/main/tasks.db";
 
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         Class.forName("org.sqlite.JDBC");
-        return DriverManager.getConnection(url);
+        return DriverManager.getConnection(URL);
     }
 
     public static void executeStatement(String sql) throws SQLException, ClassNotFoundException {
