@@ -48,6 +48,11 @@ public class Resource implements Comparable<Resource> {
         }
     }
 
+    public void setName(String name) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        Database.executeStatement(String.format("UPDATE %s SET name=%s WHERE ID=%d", TABLE_NAME, name, id));
+    }
+
     public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException {
         ResultSet rs = Database.executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
