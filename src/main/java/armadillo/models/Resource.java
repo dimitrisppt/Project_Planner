@@ -33,7 +33,8 @@ public class Resource implements Comparable<Resource> {
         Database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
     }
 
-    public int getId() {
+    public int getId() throws SQLException, ClassNotFoundException, ElementDoesNotExistException{
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         return id;
     }
 
