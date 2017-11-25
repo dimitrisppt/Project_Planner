@@ -56,6 +56,11 @@ public class Resource implements Comparable<Resource> {
         return tasks;
     }
 
+    public void addTask(Task task) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        Database.executeStatement(String.format("INSERT INTO resource_to_task (resource_id, task_id) VALUES (%d, %d)", id, task.getId()));
+    }
+
     public boolean exists() throws SQLException, ClassNotFoundException {
         ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S", TABLE_NAME));
         if (!rs.next()) return false;
