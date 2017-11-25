@@ -10,4 +10,8 @@ public class Task {
     public static Task getTaskByID(int id) {
         return new Task(id);
     }
+
+    public int getId() {
+        return id;
+    }
 }
