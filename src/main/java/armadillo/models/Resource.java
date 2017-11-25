@@ -16,15 +16,20 @@ public class Resource implements Comparable<Resource> {
         this.id = id;
     }
 
-    public static Resource getResourceByID(int id) {
+    public static Resource getResourceByID(int id) throws SQLException, ClassNotFoundException, ElementDoesNotExistException{
+        if (!exists(id)) throw new ElementDoesNotExistException(TABLE_NAME, id);
         return new Resource(id);
     }
 
     public static TreeSet<Resource> getAllResources() throws SQLException, ClassNotFoundException {
         ResultSet rs = Database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
         TreeSet<Resource> resources = new TreeSet<>();
-        while (rs.next()) {
-            resources.add(getResourceByID(rs.getInt("ID")));
+        try {
+            while (rs.next()) {
+                resources.add(getResourceByID(rs.getInt("ID")));
+            }
+        } catch (ElementDoesNotExistException e) {
+            // This will never happen
         }
         return resources;
     }
@@ -68,7 +73,13 @@ public class Resource implements Comparable<Resource> {
     }
 
     public boolean exists() throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S", TABLE_NAME));
+        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        if (!rs.next()) return false;
+        return true;
+    }
+
+    public static boolean exists(int id) throws SQLException, ClassNotFoundException {
+        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }
