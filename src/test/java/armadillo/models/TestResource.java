@@ -1,9 +1,13 @@
 package armadillo.models;
 
 import static org.junit.Assert.*;
+
+import com.sun.rowset.CachedRowSetImpl;
 import org.junit.Test;
 
-import java.sql.SQLException;
+import javax.sql.rowset.CachedRowSet;
+import javax.xml.crypto.Data;
+import java.sql.*;
 import java.util.TreeSet;
 
 public class TestResource {
@@ -26,6 +30,31 @@ public class TestResource {
         Resource.deleteResource(id);
         assertFalse(rs.exists());
         assertFalse(Resource.exists(id));
+    }
+
+    @Test
+    public void testResourceCreationWithSQL() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Resource rs1 = new Resource("logs");
+        Class.forName("org.sqlite.JDBC");
+        Connection conn = DriverManager.getConnection(Database.URL);
+        Statement sqlStatement = conn.createStatement();
+        ResultSet rs = sqlStatement.executeQuery(String.format("SELECT name FROM resources WHERE id=%d", rs1.getId()));
+        rs.next();
+        assertEquals("logs", rs.getString(1));
+        conn.close();
+        Resource.deleteResource(rs1.getId());
+    }
+
+    public void testGetNameAndGetResourceFromIDWithSQL() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Class.forName("org.sqlite.JDBC");
+        Connection conn = DriverManager.getConnection(Database.URL);
+        Statement sqlStatement = conn.createStatement();
+        sqlStatement.execute("INSERT INTO resources(name) VALUES (\"logs\")");
+        ResultSet rs = sqlStatement.getGeneratedKeys();
+        Resource resource = Resource.getResourceByID(rs.getInt(1));
+        assertEquals("logs", resource.getName());
+        conn.close();
+        Resource.deleteResource(resource.getId());
     }
 
     @Test(expected = ElementDoesNotExistException.class)
