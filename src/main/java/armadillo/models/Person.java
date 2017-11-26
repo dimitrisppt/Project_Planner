@@ -1,5 +1,6 @@
 package armadillo.models;
 
+import javax.sql.rowset.CachedRowSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.TreeSet;
@@ -11,8 +12,7 @@ public class Person implements Comparable<Person>{
     public Person(String first_name, String last_name) throws SQLException, ClassNotFoundException {
         if (first_name.length() > 30 || last_name.length() > 30)
             throw new IllegalArgumentException("names must be under 30 Characters in length");
-        ResultSet rs = Database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (%s, %s)", TABLE_NAME, first_name, last_name));
-        id = rs.getInt("ID");
+        id = Database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (%s, %s)", TABLE_NAME, first_name, last_name));
     }
 
     private Person(int id) {
@@ -25,23 +25,19 @@ public class Person implements Comparable<Person>{
     }
 
     public String getFirstName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT first_name FROM %s WHERE ID=%d", TABLE_NAME, id));
-        if (!rs.next()) {
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT first_name FROM %s WHERE ID=%d", TABLE_NAME, id));
+        if (!exists())
             throw new ElementDoesNotExistException(TABLE_NAME, id);
-        } else {
-            rs.beforeFirst();
-            return rs.getString("first_name");
-        }
+        rs.next();
+        return rs.getString("first_name");
     }
 
     public String getLastName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT last_name FROM %s WHERE ID=%d", TABLE_NAME, id));
-        if (!rs.next()) {
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT last_name FROM %s WHERE ID=%d", TABLE_NAME, id));
+        if (!exists())
             throw new ElementDoesNotExistException(TABLE_NAME, id);
-        } else {
-            rs.beforeFirst();
-            return rs.getString("last_name");
-        }
+        rs.next();
+        return rs.getString("last_name");
     }
 
     public void setFirstName(String firstName) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
@@ -68,7 +64,7 @@ public class Person implements Comparable<Person>{
     }
 
     public static TreeSet<Person> getAllPeople() throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
         TreeSet<Person> people = new TreeSet<>();
         try {
             while (rs.next()) {
@@ -81,7 +77,7 @@ public class Person implements Comparable<Person>{
     }
 
     public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT task_id FROM people_to_tasks WHERE person_id=%d", id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT task_id FROM people_to_tasks WHERE person_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
         while (rs.next()) {
             tasks.add(Task.getTaskByID(rs.getInt("task_id")));
@@ -95,13 +91,13 @@ public class Person implements Comparable<Person>{
     }
 
     public boolean exists() throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }
 
     public static boolean exists(int id) throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }

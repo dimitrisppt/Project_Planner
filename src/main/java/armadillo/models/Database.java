@@ -1,5 +1,9 @@
 package armadillo.models;
 
+import com.sun.rowset.CachedRowSetImpl;
+
+import javax.sql.rowset.CachedRowSet;
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 
 public class Database {
@@ -17,20 +21,23 @@ public class Database {
         conn.close();
     }
 
-    public static ResultSet executeInsertStatement(String sql) throws SQLException, ClassNotFoundException {
+    public static int executeInsertStatement(String sql) throws SQLException, ClassNotFoundException {
         Connection conn = getConnection();
         Statement sqlStatement = conn.createStatement();
         sqlStatement.execute(sql);
         ResultSet rs = sqlStatement.getGeneratedKeys();
+        int returnValue = rs.getInt(1);
         conn.close();
-        return rs;
+        return returnValue;
     }
 
-    public static ResultSet executeQuery(String sql) throws SQLException, ClassNotFoundException {
+    public static CachedRowSet executeQuery(String sql) throws SQLException, ClassNotFoundException {
         Connection conn = getConnection();
         Statement sqlStatement = conn.createStatement();
         ResultSet rs = sqlStatement.executeQuery(sql);
+        CachedRowSet crs = new CachedRowSetImpl();
+        crs.populate(rs);
         conn.close();
-        return rs;
+        return crs;
     }
 }

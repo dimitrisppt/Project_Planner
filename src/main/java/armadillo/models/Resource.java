@@ -1,5 +1,6 @@
 package armadillo.models;
 
+import javax.sql.rowset.CachedRowSet;
 import java.sql.*;
 import java.util.TreeSet;
 
@@ -9,8 +10,8 @@ public class Resource implements Comparable<Resource> {
 
     public Resource(String name) throws SQLException, ClassNotFoundException {
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
-        ResultSet rs = Database.executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (%s)", TABLE_NAME, name));
-        id = rs.getInt("ID");
+        id = Database.executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (\"%s\");", TABLE_NAME, name));
+
     }
 
     private Resource(int id) {
@@ -23,14 +24,10 @@ public class Resource implements Comparable<Resource> {
     }
 
     public static TreeSet<Resource> getAllResources() throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
         TreeSet<Resource> resources = new TreeSet<>();
-        try {
-            while (rs.next()) {
-                resources.add(getResourceByID(rs.getInt("ID")));
-            }
-        } catch (ElementDoesNotExistException e) {
-            // This will never happen
+        while (rs.next()) {
+            resources.add(new Resource(rs.getInt("ID")));
         }
         return resources;
     }
@@ -45,22 +42,19 @@ public class Resource implements Comparable<Resource> {
     }
 
     public String getName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT name FROM %s WHERE ID=%d", TABLE_NAME, id));
-        if (!rs.next()) {
-            throw new ElementDoesNotExistException(TABLE_NAME, id);
-        } else {
-            rs.beforeFirst();
-            return rs.getString("name");
-        }
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT name FROM %s WHERE ID=%d", TABLE_NAME, id));
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        rs.next();
+        return rs.getString("name");
     }
 
     public void setName(String name) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        Database.executeStatement(String.format("UPDATE %s SET name=%s WHERE ID=%d", TABLE_NAME, name, id));
+        Database.executeStatement(String.format("UPDATE %s SET name=\"%s\" WHERE ID=%d", TABLE_NAME, name, id));
     }
 
     public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
         while (rs.next()) {
             tasks.add(Task.getTaskByID(rs.getInt("task_id")));
@@ -74,13 +68,13 @@ public class Resource implements Comparable<Resource> {
     }
 
     public boolean exists() throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }
 
     public static boolean exists(int id) throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }

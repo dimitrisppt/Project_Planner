@@ -1,5 +1,6 @@
 package armadillo.models;
 
+import javax.sql.rowset.CachedRowSet;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,8 +14,7 @@ public class TaskToTime implements Comparable<TaskToTime>{
 
     public TaskToTime(Task t, LocalDateTime dateTime) throws SQLException, ClassNotFoundException{
         long timeSinceEpoch = dateTime.atZone(ZoneOffset.UTC).toEpochSecond();
-        ResultSet rs = Database.executeInsertStatement(String.format("INSERT INTO %s (task_id, time) VALUES (%s, %s)", TABLE_NAME, t.getId(), timeSinceEpoch));
-        id = rs.getInt("ID");
+        id = Database.executeInsertStatement(String.format("INSERT INTO %s (task_id, time) VALUES (%s, %s)", TABLE_NAME, t.getId(), timeSinceEpoch));
     }
 
     private TaskToTime(int id) {
@@ -32,7 +32,7 @@ public class TaskToTime implements Comparable<TaskToTime>{
     }
 
     public Task getTask() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT task_id FROM %s WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT task_id FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) {
             throw new ElementDoesNotExistException(TABLE_NAME, id);
         } else {
@@ -42,7 +42,7 @@ public class TaskToTime implements Comparable<TaskToTime>{
     }
 
     public LocalDateTime getTime() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT time FROM %s WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT time FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) {
             throw new ElementDoesNotExistException(TABLE_NAME, id);
         } else {
@@ -52,13 +52,13 @@ public class TaskToTime implements Comparable<TaskToTime>{
     }
 
     public boolean exists() throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }
 
     public static boolean exists(int id) throws SQLException, ClassNotFoundException {
-        ResultSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }
