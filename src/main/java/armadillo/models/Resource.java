@@ -56,8 +56,13 @@ public class Resource implements Comparable<Resource> {
     public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException {
         CachedRowSet rs = Database.executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
-        while (rs.next()) {
-            tasks.add(Task.getTaskByID(rs.getInt("task_id")));
+        try {
+            while (rs.next()) {
+                tasks.add(Task.getTaskByID(rs.getInt("task_id")));
+            }
+        }
+        catch (ElementDoesNotExistException e) {
+            //Check if Ok
         }
         return tasks;
     }
