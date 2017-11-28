@@ -2,11 +2,8 @@ package armadillo.models;
 
 import static org.junit.Assert.*;
 
-import com.sun.rowset.CachedRowSetImpl;
 import org.junit.Test;
 
-import javax.sql.rowset.CachedRowSet;
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.TreeSet;
 
@@ -32,7 +29,7 @@ public class TestResource {
         assertTrue(rs.exists());
         int id = rs.getId();
         assertTrue(Resource.exists(id));
-        Resource.deleteResource(id);
+        Resource.delete(id);
         assertFalse(rs.exists());
         assertFalse(Resource.exists(id));
     }
@@ -47,7 +44,7 @@ public class TestResource {
         rs.next();
         assertEquals("logs", rs.getString(1));
         conn.close();
-        Resource.deleteResource(rs1.getId());
+        Resource.delete(rs1.getId());
     }
 
     @Test
@@ -60,7 +57,7 @@ public class TestResource {
         Resource resource = Resource.getResourceByID(rs.getInt(1));
         assertEquals("logs", resource.getName());
         conn.close();
-        Resource.deleteResource(resource.getId());
+        Resource.delete(resource.getId());
     }
 
     @Test(expected = ElementDoesNotExistException.class)
@@ -71,7 +68,7 @@ public class TestResource {
     @Test(expected = ElementDoesNotExistException.class)
     public void testGetNameThrowsElementDoesNotExistExceptionCorrectly() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs = new Resource("logs");
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
         rs.getName();
     }
 
@@ -84,7 +81,7 @@ public class TestResource {
         } catch (IllegalArgumentException e) {
             assertEquals("Exception Thrown", true, true);
         }
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
     }
 
     @Test
@@ -96,14 +93,14 @@ public class TestResource {
         } catch (IllegalArgumentException e) {
             assertEquals("Exception Thrown", true, true);
         }
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
     }
 
 
     @Test(expected = ElementDoesNotExistException.class)
     public void testGetIDThrowsElementDoesNotExistExceptionCorrectly() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs = new Resource("logs");
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
         rs.getId();
     }
 
@@ -112,7 +109,7 @@ public class TestResource {
         Resource rs = new Resource("logs");
         rs.setName("trees");
         assertEquals("trees", rs.getName());
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
     }
     @Test
     public void testSetNameWhenNameIsTooLong() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
@@ -127,13 +124,13 @@ public class TestResource {
         } catch (IllegalArgumentException e) {
             assertEquals("Exception Thrown", true, true);
         }
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
     }
 
     @Test(expected = ElementDoesNotExistException.class)
     public void testSetNameThrowsElementDoesNotExistExceptionCorrectly() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs = new Resource("logs");
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
         rs.setName("trees");
     }
 
@@ -142,21 +139,21 @@ public class TestResource {
         Resource rs1 = new Resource("logs");
         Resource rs2 = Resource.getResourceByID(rs1.getId());
         assertTrue(rs1.equals(rs2));
-        Resource.deleteResource(rs1.getId());
+        Resource.delete(rs1.getId());
     }
 
     @Test
     public void testEqualsWhenOneIsNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs = new Resource("dogs");
         assertFalse(rs.equals(null));
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
     }
 
     @Test
     public void testEqualsWhenOneIsAnotherClass() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs = new Resource("dogs");
         assertFalse(rs.equals("Hello"));
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
     }
 
     @Test
@@ -164,7 +161,7 @@ public class TestResource {
         Resource rs = new Resource("dogs");
         assertTrue(rs == rs);
         assertTrue(rs.equals(rs));
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
     }
 
     @Test
@@ -172,15 +169,15 @@ public class TestResource {
         Resource rs1 = new Resource("dogs");
         Resource rs2 = new Resource("logs");
         assertFalse(rs1.equals(rs2));
-        Resource.deleteResource(rs1.getId());
-        Resource.deleteResource(rs2.getId());
+        Resource.delete(rs1.getId());
+        Resource.delete(rs2.getId());
     }
 
     @Test
     public void testHashCode() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs = new Resource("dogs");
         assertEquals(rs.getId(), rs.hashCode());
-        Resource.deleteResource(rs.getId());
+        Resource.delete(rs.getId());
     }
 
     @Test
@@ -189,8 +186,8 @@ public class TestResource {
         Resource rs2 = new Resource("logs");
         assertEquals(-1, rs1.compareTo(rs2));
         assertEquals(1, rs2.compareTo(rs1));
-        Resource.deleteResource(rs1.getId());
-        Resource.deleteResource(rs2.getId());
+        Resource.delete(rs1.getId());
+        Resource.delete(rs2.getId());
     }
 
     @Test
@@ -201,7 +198,7 @@ public class TestResource {
         resources.add(new Resource("cats"));
         assertEquals(resources, Resource.getAllResources());
         for (Resource resource : resources) {
-            Resource.deleteResource(resource.getId());
+            Resource.delete(resource.getId());
         }
     }
 }
