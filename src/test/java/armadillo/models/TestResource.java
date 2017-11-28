@@ -45,6 +45,7 @@ public class TestResource {
         Resource.deleteResource(rs1.getId());
     }
 
+    @Test
     public void testGetNameAndGetResourceFromIDWithSQL() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Class.forName("org.sqlite.JDBC");
         Connection conn = DriverManager.getConnection(Database.URL);
@@ -58,11 +59,41 @@ public class TestResource {
     }
 
     @Test(expected = ElementDoesNotExistException.class)
+    public void testGetResourceFromIDWhenDoesNotExist() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Resource rs = Resource.getResourceByID(-1);
+    }
+
+    @Test(expected = ElementDoesNotExistException.class)
     public void testGetNameThrowsElementDoesNotExistExceptionCorrectly() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs = new Resource("logs");
         Resource.deleteResource(rs.getId());
         rs.getName();
     }
+
+    @Test
+    public void testAddTaskWhenTaskIsNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Resource rs = new Resource("logs");
+        try {
+            rs.addTask(null);
+            assertEquals("This should never be reached", true, false);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Exception Thrown", true, true);
+        }
+        Resource.deleteResource(rs.getId());
+    }
+
+    @Test
+    public void testSetNameWhenNameIsNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Resource rs = new Resource("logs");
+        try {
+            rs.setName(null);
+            assertEquals("This should never be reached", true, false);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Exception Thrown", true, true);
+        }
+        Resource.deleteResource(rs.getId());
+    }
+
 
     @Test(expected = ElementDoesNotExistException.class)
     public void testGetIDThrowsElementDoesNotExistExceptionCorrectly() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
@@ -76,6 +107,21 @@ public class TestResource {
         Resource rs = new Resource("logs");
         rs.setName("trees");
         assertEquals("trees", rs.getName());
+        Resource.deleteResource(rs.getId());
+    }
+    @Test
+    public void testSetNameWhenNameIsTooLong() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Resource rs = new Resource("logs");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i <= 255; i++) {
+            sb.append('a');
+        }
+        try {
+            rs.setName(sb.toString());
+            assertEquals("This should never be reached", true, false);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Exception Thrown", true, true);
+        }
         Resource.deleteResource(rs.getId());
     }
 

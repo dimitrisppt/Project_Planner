@@ -49,6 +49,8 @@ public class Resource implements Comparable<Resource> {
     }
 
     public void setName(String name) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (name == null) throw new IllegalArgumentException("name cannot be null");
+        if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         Database.executeStatement(String.format("UPDATE %s SET name=\"%s\" WHERE ID=%d", TABLE_NAME, name, id));
     }
@@ -68,20 +70,19 @@ public class Resource implements Comparable<Resource> {
     }
 
     public void addTask(Task task) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (task == null) throw new IllegalArgumentException("task cannot be null");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         Database.executeStatement(String.format("INSERT INTO resource_to_task (resource_id, task_id) VALUES (%d, %d)", id, task.getId()));
     }
 
     public boolean exists() throws SQLException, ClassNotFoundException {
         CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
-        if (!rs.next()) return false;
-        return true;
+        return rs.next();
     }
 
     public static boolean exists(int id) throws SQLException, ClassNotFoundException {
         CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
-        if (!rs.next()) return false;
-        return true;
+        return rs.next();
     }
 
     @Override

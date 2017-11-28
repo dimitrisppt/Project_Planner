@@ -76,7 +76,7 @@ public class Person implements Comparable<Person>{
         return people;
     }
 
-    public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException {
+    public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         CachedRowSet rs = Database.executeQuery(String.format("SELECT task_id FROM people_to_tasks WHERE person_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
         while (rs.next()) {

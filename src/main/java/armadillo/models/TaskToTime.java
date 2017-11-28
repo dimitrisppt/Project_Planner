@@ -12,7 +12,7 @@ public class TaskToTime implements Comparable<TaskToTime>{
     private int id;
     public final static String TABLE_NAME = "schedule";
 
-    public TaskToTime(Task t, LocalDateTime dateTime) throws SQLException, ClassNotFoundException{
+    public TaskToTime(Task t, LocalDateTime dateTime) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         long timeSinceEpoch = dateTime.atZone(ZoneOffset.UTC).toEpochSecond();
         id = Database.executeInsertStatement(String.format("INSERT INTO %s (task_id, time) VALUES (%s, %s)", TABLE_NAME, t.getId(), timeSinceEpoch));
     }
