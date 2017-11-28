@@ -75,6 +75,7 @@ task createTaskDatabase {
 }
 
 tasks.build.dependsOn(createTaskDatabase)
+tasks.testClasses.dependsOn(createTaskDatabase);
 
 task createTestDatabase {
     delete 'build/resources/test/test.db'
