@@ -20,6 +20,11 @@ public class TestResource {
         Resource rs = new Resource(sb.toString());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWhenNameIsNull() throws SQLException, ClassNotFoundException {
+        Resource rs = new Resource(null);
+    }
+
     @Test
     public void testResourceCreationAndDeletionAndGetNameAndGetIDAndExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs = new Resource("logs");

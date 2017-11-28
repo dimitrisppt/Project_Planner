@@ -9,6 +9,7 @@ public class Resource implements Comparable<Resource> {
     public final static String TABLE_NAME = "resources";
 
     public Resource(String name) throws SQLException, ClassNotFoundException {
+        if (name == null) throw new IllegalArgumentException("name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         id = Database.executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (\"%s\");", TABLE_NAME, name));
 
