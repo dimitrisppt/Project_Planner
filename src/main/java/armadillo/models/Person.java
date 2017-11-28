@@ -10,9 +10,10 @@ public class Person implements Comparable<Person>{
     public final static String TABLE_NAME = "people";
 
     public Person(String first_name, String last_name) throws SQLException, ClassNotFoundException {
+        if (first_name == null || last_name == null) throw new IllegalArgumentException("names cannot be null");
         if (first_name.length() > 30 || last_name.length() > 30)
             throw new IllegalArgumentException("names must be under 30 Characters in length");
-        id = Database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (%s, %s)", TABLE_NAME, first_name, last_name));
+        id = Database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (\"%s\", \"%s\")", TABLE_NAME, first_name, last_name));
     }
 
     private Person(int id) {
@@ -41,13 +42,17 @@ public class Person implements Comparable<Person>{
     }
 
     public void setFirstName(String firstName) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (firstName == null) throw new IllegalArgumentException("firstName cannot be null");
+        if (firstName.length() > 30) throw new IllegalArgumentException("firstName must be under 30 characters");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        Database.executeStatement(String.format("UPDATE %s SET first_name=%s WHERE ID=%d", TABLE_NAME, firstName, id));
+        Database.executeStatement(String.format("UPDATE %s SET first_name=\"%s\" WHERE ID=%d", TABLE_NAME, firstName, id));
     }
 
     public void setLastName(String lastName) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (lastName == null) throw new IllegalArgumentException("lastName cannot be null");
+        if (lastName.length() > 30) throw new IllegalArgumentException("lastName must be under 30 characters");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        Database.executeStatement(String.format("UPDATE %s SET last_name=%s WHERE ID=%d", TABLE_NAME, lastName, id));
+        Database.executeStatement(String.format("UPDATE %s SET last_name=\"%s\" WHERE ID=%d", TABLE_NAME, lastName, id));
     }
 
     public String getFullName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
@@ -66,12 +71,8 @@ public class Person implements Comparable<Person>{
     public static TreeSet<Person> getAllPeople() throws SQLException, ClassNotFoundException {
         CachedRowSet rs = Database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
         TreeSet<Person> people = new TreeSet<>();
-        try {
-            while (rs.next()) {
-                people.add(getPersonByID(rs.getInt("ID")));
-            }
-        } catch (ElementDoesNotExistException e) {
-            // This will never happen
+        while (rs.next()) {
+            people.add(new Person(rs.getInt("ID")));
         }
         return people;
     }
@@ -86,6 +87,7 @@ public class Person implements Comparable<Person>{
     }
 
     public void addTask(Task task) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (task == null) throw new IllegalArgumentException("Task cannot be null");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         Database.executeStatement(String.format("INSERT INTO people_to_tasks (person_id, task_id) VALUES (%d, %d)", id, task.getId()));
     }
