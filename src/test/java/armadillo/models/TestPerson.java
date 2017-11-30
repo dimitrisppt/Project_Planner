@@ -16,7 +16,7 @@ public class TestPerson {
         assertEquals("Greener", p.getLastName());
         assertTrue(p.exists());
         assertTrue(Person.exists(personId));
-        Person.deletePerson(personId);
+        Person.delete(personId);
         assertFalse(p.exists());
         assertFalse(Person.exists(personId));
     }
@@ -53,14 +53,14 @@ public class TestPerson {
     @Test(expected = ElementDoesNotExistException.class)
     public void testGetFirstNameAfterPersonDeleted() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p = new Person("Robert", "Greener");
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
         p.getFirstName();
     }
 
     @Test(expected = ElementDoesNotExistException.class)
     public void testGetLastNameAfterPersonDeleted() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p = new Person("Robert", "Greener");
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
         p.getLastName();
     }
 
@@ -72,7 +72,7 @@ public class TestPerson {
         people.add(new Person("Test", "Three"));
         assertEquals(people, Person.getAllPeople());
         for (Person person : people) {
-            Person.deletePerson(person.getId());
+            Person.delete(person.getId());
         }
     }
 
@@ -80,13 +80,13 @@ public class TestPerson {
     public void testGetFullName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p = new Person("Robert", "Greener");
         assertEquals("Robert Greener", p.getFullName());
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 
     @Test(expected = ElementDoesNotExistException.class)
     public void testGetIDAfterPersonDeleted() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p = new Person("Robert", "Greener");
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
         p.getId();
     }
 
@@ -99,7 +99,7 @@ public class TestPerson {
         } catch (IllegalArgumentException e) {
             assertEquals("Exception Thrown", true, true);
         }
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 
     @Test
@@ -111,7 +111,7 @@ public class TestPerson {
         } catch (IllegalArgumentException e) {
             assertEquals("Exception Thrown", true, true);
         }
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 
     @Test
@@ -127,7 +127,7 @@ public class TestPerson {
         } catch (IllegalArgumentException e) {
             assertEquals("Exception Thrown", true, true);
         }
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 
     @Test
@@ -143,20 +143,20 @@ public class TestPerson {
         } catch (IllegalArgumentException e) {
             assertEquals("Exception Thrown", true, true);
         }
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 
     @Test(expected = ElementDoesNotExistException.class)
     public void testSetFirstNameWhenPersonHasBeenDeleted() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p = new Person("Robert", "Greener");
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
         p.setFirstName("Rob");
     }
 
     @Test(expected = ElementDoesNotExistException.class)
     public void testSetLastNameWhenPersonHasBeenDeleted() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p = new Person("Robert", "Greener");
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
         p.setLastName("Green");
     }
 
@@ -165,7 +165,7 @@ public class TestPerson {
         Person p = new Person("Robert", "Greener");
         p.setFirstName("Rob");
         assertEquals("Rob", p.getFirstName());
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 
     @Test
@@ -173,14 +173,14 @@ public class TestPerson {
         Person p = new Person("Robert", "Greener");
         p.setLastName("Green");
         assertEquals("Green", p.getLastName());
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 
     @Test
     public void testHashCode() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p = new Person("Robert", "Greener");
         assertEquals(p.getId(), p.hashCode());
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 
     @Test
@@ -188,14 +188,14 @@ public class TestPerson {
         Person p1 = new Person("Robert", "Greener");
         Person p2 = Person.getPersonByID(p1.getId());
         assertTrue(p1.equals(p2));
-        Person.deletePerson(p1.getId());
+        Person.delete(p1.getId());
     }
 
     @Test(expected = ElementDoesNotExistException.class)
     public void testGetPersonByIDWhenNotExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p1 = new Person("Robert", "Greener");
         int id = p1.getId();
-        Person.deletePerson(id);
+        Person.delete(id);
         Person p2 = Person.getPersonByID(id);
     }
 
@@ -204,7 +204,7 @@ public class TestPerson {
         Person p1 = new Person("Robert", "Greener");
         Person p2 = p1;
         assertTrue(p1.equals(p2));
-        Person.deletePerson(p1.getId());
+        Person.delete(p1.getId());
     }
 
     @Test
@@ -224,7 +224,7 @@ public class TestPerson {
         Person p1 = new Person("Robert", "Greener");
         Person p2 = Person.getPersonByID(p1.getId());
         assertTrue(p1.equals(p2));
-        Person.deletePerson(p1.getId());
+        Person.delete(p1.getId());
     }
 
     @Test
@@ -232,8 +232,8 @@ public class TestPerson {
         Person p1 = new Person("Robert", "Greener");
         Person p2 = new Person("Test", "One");
         assertFalse(p1.equals(p2));
-        Person.deletePerson(p1.getId());
-        Person.deletePerson(p2.getId());
+        Person.delete(p1.getId());
+        Person.delete(p2.getId());
     }
 
     @Test
@@ -245,6 +245,6 @@ public class TestPerson {
         } catch (IllegalArgumentException e) {
             assertEquals("Exception Thrown", true, true);
         }
-        Person.deletePerson(p.getId());
+        Person.delete(p.getId());
     }
 }
