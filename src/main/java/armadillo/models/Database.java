@@ -1,9 +1,7 @@
 package armadillo.models;
 
-import com.sun.rowset.CachedRowSetImpl;
-
 import javax.sql.rowset.CachedRowSet;
-import javax.swing.plaf.nimbus.State;
+import javax.sql.rowset.RowSetProvider;
 import java.sql.*;
 
 /**
@@ -67,7 +65,7 @@ public class Database {
         Connection conn = getConnection();
         Statement sqlStatement = conn.createStatement();
         ResultSet rs = sqlStatement.executeQuery(sql);
-        CachedRowSet crs = new CachedRowSetImpl();
+        CachedRowSet crs = RowSetProvider.newFactory().createCachedRowSet();
         crs.populate(rs);
         conn.close();
         return crs;
