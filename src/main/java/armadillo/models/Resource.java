@@ -26,7 +26,7 @@ public class Resource implements Comparable<Resource> {
      * @param name the name of the resource, not nul
      * @throws SQLException If there is an error with the SQL statements, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
-     * @throws IllegalArgumentException If name.length() > 255 or name is null
+     * @throws IllegalArgumentException If name.length() &gt; 255 or name is null
      */
     public Resource(String name) throws SQLException, ClassNotFoundException {
         if (name == null) throw new IllegalArgumentException("name cannot be null");
@@ -122,7 +122,7 @@ public class Resource implements Comparable<Resource> {
      * @throws SQLException If the SQL statement is not valid, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      * @throws ElementDoesNotExistException If the element has been deleted from the database
-     * @throws IllegalArgumentException If name.length() > 255 or name is null
+     * @throws IllegalArgumentException If name.length() &gt; 255 or name is null
      */
     public void setName(String name) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (name == null) throw new IllegalArgumentException("name cannot be null");
