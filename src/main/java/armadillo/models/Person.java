@@ -3,6 +3,8 @@ package armadillo.models;
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This represents the person table in the database
@@ -20,17 +22,21 @@ public class Person implements Comparable<Person>{
 
     /**
      * Creates a new person
-     * @param first_name The first name of the person
-     * @param last_name The last name of the person
+     * @param firstName The first name of the person
+     * @param lastName The last name of the person
      * @throws SQLException If there is an error with the SQL Statement, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
-     * @throws IllegalArgumentException If one of the names is null or the length of the names is greater than 30
+     * @throws IllegalArgumentException If one of the names is null or the length of the names is greater than 30, or if the name is not valid
      */
-    public Person(String first_name, String last_name) throws SQLException, ClassNotFoundException {
-        if (first_name == null || last_name == null) throw new IllegalArgumentException("names cannot be null");
-        if (first_name.length() > 30 || last_name.length() > 30)
+    public Person(String firstName, String lastName) throws SQLException, ClassNotFoundException {
+        if (firstName == null || lastName == null) throw new IllegalArgumentException("names cannot be null");
+        if (firstName.length() > 30 || lastName.length() > 30)
             throw new IllegalArgumentException("names must be under 30 Characters in length");
-        id = Database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (\"%s\", \"%s\")", TABLE_NAME, first_name, last_name));
+        Pattern p = Pattern.compile("^([ \\u00c0-\\u01ffa-zA-Z'\\-])+$");
+        Matcher m1 = p.matcher(firstName);
+        Matcher m2 = p.matcher(lastName);
+        if (!m1.find() || !m2.find()) throw new IllegalArgumentException("names must be a valid name (no special characters, numbers etc.)");
+        id = Database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (\"%s\", \"%s\")", TABLE_NAME, firstName, lastName));
     }
 
     /**
@@ -89,11 +95,14 @@ public class Person implements Comparable<Person>{
      * @throws SQLException If there is an error with the SQL Statement, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      * @throws ElementDoesNotExistException If the element does not exist in the database
-     * @throws IllegalArgumentException If firstName is null, or longer than 30 chars
+     * @throws IllegalArgumentException If firstName is null, or longer than 30 chars, or if the name is not valid
      */
     public void setFirstName(String firstName) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (firstName == null) throw new IllegalArgumentException("firstName cannot be null");
         if (firstName.length() > 30) throw new IllegalArgumentException("firstName must be under 30 characters");
+        Pattern p = Pattern.compile("^([ \\u00c0-\\u01ffa-zA-Z'\\-])+$");
+        Matcher m = p.matcher(firstName);
+        if (!m.find()) throw new IllegalArgumentException("firstName must be a valid name (no special characters, numbers etc.)");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         Database.executeStatement(String.format("UPDATE %s SET first_name=\"%s\" WHERE ID=%d", TABLE_NAME, firstName, id));
     }
@@ -109,6 +118,9 @@ public class Person implements Comparable<Person>{
     public void setLastName(String lastName) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (lastName == null) throw new IllegalArgumentException("lastName cannot be null");
         if (lastName.length() > 30) throw new IllegalArgumentException("lastName must be under 30 characters");
+        Pattern p = Pattern.compile("^([ \\u00c0-\\u01ffa-zA-Z'\\-])+$");
+        Matcher m = p.matcher(lastName);
+        if (!m.find()) throw new IllegalArgumentException("lastName must be a valid name (no special characters, numbers etc.)");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         Database.executeStatement(String.format("UPDATE %s SET last_name=\"%s\" WHERE ID=%d", TABLE_NAME, lastName, id));
     }

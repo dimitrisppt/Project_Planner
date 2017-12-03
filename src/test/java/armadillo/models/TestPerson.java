@@ -247,4 +247,38 @@ public class TestPerson {
         }
         Person.delete(p.getId());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreatePersonWhenFirstNameIsNotValid() throws SQLException, ClassNotFoundException {
+        new Person("R@bert", "Greener");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreatePersonWhenLastNameIsNotValid() throws SQLException, ClassNotFoundException {
+        new Person("Robert", "Gree=nr");
+    }
+
+    @Test
+    public void testSetFirstNameWhenNotValid() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Person p = new Person("Robert", "Greener");
+        try {
+            p.setFirstName("R@294rt");
+            assertEquals("This should never be reached", true, false);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Exception Thrown", true, true);
+        }
+        Person.delete(p.getId());
+    }
+
+    @Test
+    public void testSetLastNameWhenNotValid() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Person p = new Person("Robert", "Greener");
+        try {
+            p.setLastName("R=294rt");
+            assertEquals("This should never be reached", true, false);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Exception Thrown", true, true);
+        }
+        Person.delete(p.getId());
+    }
 }
