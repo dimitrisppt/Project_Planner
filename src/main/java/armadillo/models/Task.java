@@ -1,6 +1,7 @@
 package armadillo.models;
 
 import javax.sql.rowset.CachedRowSet;
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.TreeSet;
 
@@ -14,6 +15,10 @@ public class Task implements Comparable<Task>{
     }
 
     private Task(int id) {
+        this.id = id;
+    }
+
+    Task(int id, Database database) {
         this.id = id;
     }
 
