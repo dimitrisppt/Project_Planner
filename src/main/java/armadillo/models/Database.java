@@ -9,9 +9,19 @@ import java.sql.*;
  */
 public class Database {
     /**
-     * JDBC URL of the database
+     * JDBC url of the task database
      */
-    public final static String URL = "jdbc:sqlite:build/resources/main/tasks.db";
+    public final static String MAIN_URL = "jdbc:sqlite:build/resources/main/tasks.db";
+
+    private String url;
+
+    public Database() {
+        url = MAIN_URL;
+    }
+
+    public Database(String url) {
+        this.url = url;
+    }
 
     /**
      * Gets the connection to the database
@@ -19,22 +29,9 @@ public class Database {
      * @throws SQLException If there is an error connecting to the database
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      */
-    public static Connection getConnection() throws SQLException, ClassNotFoundException {
+    public Connection getConnection() throws SQLException, ClassNotFoundException {
         Class.forName("org.sqlite.JDBC");
-        return DriverManager.getConnection(URL);
-    }
-
-    /**
-     * Executes an SQL statement
-     * @param sql The SQL statement
-     * @throws SQLException If the SQL Statement is not valid, or a connection cannot be made to the database
-     * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
-     */
-    public static void executeStatement(String sql) throws SQLException, ClassNotFoundException {
-        Connection conn = getConnection();
-        Statement sqlStatement = conn.createStatement();
-        sqlStatement.execute(sql);
-        conn.close();
+        return DriverManager.getConnection(url);
     }
 
     /**
@@ -44,7 +41,7 @@ public class Database {
      * @throws SQLException If the SQL Statement is not valid, or a connection cannot be made to the database
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      */
-    public static int executeInsertStatement(String sql) throws SQLException, ClassNotFoundException {
+    public int executeInsertStatement(String sql) throws SQLException, ClassNotFoundException {
         Connection conn = getConnection();
         Statement sqlStatement = conn.createStatement();
         sqlStatement.execute(sql);
@@ -61,7 +58,7 @@ public class Database {
      * @throws SQLException If the SQL Statement is not valid, or a connection cannot be made to the database
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      */
-    public static CachedRowSet executeQuery(String sql) throws SQLException, ClassNotFoundException {
+    public CachedRowSet executeQuery(String sql) throws SQLException, ClassNotFoundException {
         Connection conn = getConnection();
         Statement sqlStatement = conn.createStatement();
         ResultSet rs = sqlStatement.executeQuery(sql);
@@ -69,5 +66,18 @@ public class Database {
         crs.populate(rs);
         conn.close();
         return crs;
+    }
+
+    /**
+     * Executes an SQL statement
+     * @param sql The SQL statement
+     * @throws SQLException If the SQL Statement is not valid, or a connection cannot be made to the database
+     * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
+     */
+    public void executeStatement(String sql) throws SQLException, ClassNotFoundException {
+        Connection conn = getConnection();
+        Statement sqlStatement = conn.createStatement();
+        sqlStatement.execute(sql);
+        conn.close();
     }
 }

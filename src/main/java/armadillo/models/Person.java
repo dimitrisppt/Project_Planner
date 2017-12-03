@@ -30,7 +30,7 @@ public class Person implements Comparable<Person>{
         if (first_name == null || last_name == null) throw new IllegalArgumentException("names cannot be null");
         if (first_name.length() > 30 || last_name.length() > 30)
             throw new IllegalArgumentException("names must be under 30 Characters in length");
-        id = Database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (\"%s\", \"%s\")", TABLE_NAME, first_name, last_name));
+        id = new Database().executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (\"%s\", \"%s\")", TABLE_NAME, first_name, last_name));
     }
 
     /**
@@ -61,7 +61,7 @@ public class Person implements Comparable<Person>{
      * @throws ElementDoesNotExistException If the element does not exist in the database
      */
     public String getFirstName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT first_name FROM %s WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT first_name FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!exists())
             throw new ElementDoesNotExistException(TABLE_NAME, id);
         rs.next();
@@ -76,7 +76,7 @@ public class Person implements Comparable<Person>{
      * @throws ElementDoesNotExistException If the element does not exist in the database
      */
     public String getLastName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT last_name FROM %s WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT last_name FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!exists())
             throw new ElementDoesNotExistException(TABLE_NAME, id);
         rs.next();
@@ -95,7 +95,7 @@ public class Person implements Comparable<Person>{
         if (firstName == null) throw new IllegalArgumentException("firstName cannot be null");
         if (firstName.length() > 30) throw new IllegalArgumentException("firstName must be under 30 characters");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        Database.executeStatement(String.format("UPDATE %s SET first_name=\"%s\" WHERE ID=%d", TABLE_NAME, firstName, id));
+        new Database().executeStatement(String.format("UPDATE %s SET first_name=\"%s\" WHERE ID=%d", TABLE_NAME, firstName, id));
     }
 
     /**
@@ -110,7 +110,7 @@ public class Person implements Comparable<Person>{
         if (lastName == null) throw new IllegalArgumentException("lastName cannot be null");
         if (lastName.length() > 30) throw new IllegalArgumentException("lastName must be under 30 characters");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        Database.executeStatement(String.format("UPDATE %s SET last_name=\"%s\" WHERE ID=%d", TABLE_NAME, lastName, id));
+        new Database().executeStatement(String.format("UPDATE %s SET last_name=\"%s\" WHERE ID=%d", TABLE_NAME, lastName, id));
     }
 
     /**
@@ -131,7 +131,7 @@ public class Person implements Comparable<Person>{
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      */
     public static void delete(int id) throws SQLException, ClassNotFoundException {
-        Database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+        new Database().executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
     }
 
     /**
@@ -140,7 +140,7 @@ public class Person implements Comparable<Person>{
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      */
     public void delete() throws SQLException, ClassNotFoundException {
-        Database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+        new Database().executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
     }
 
     /**
@@ -163,7 +163,7 @@ public class Person implements Comparable<Person>{
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      */
     public static TreeSet<Person> getAllPeople() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
         TreeSet<Person> people = new TreeSet<>();
         while (rs.next()) {
             people.add(new Person(rs.getInt("ID")));
@@ -179,7 +179,7 @@ public class Person implements Comparable<Person>{
      * @throws ElementDoesNotExistException If the element does not exist in the database
      */
     public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT task_id FROM people_to_tasks WHERE person_id=%d", id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT task_id FROM people_to_tasks WHERE person_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
         while (rs.next()) {
             tasks.add(Task.getTaskByID(rs.getInt("task_id")));
@@ -197,7 +197,7 @@ public class Person implements Comparable<Person>{
     public void addTask(Task task) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (task == null) throw new IllegalArgumentException("Task cannot be null");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        Database.executeStatement(String.format("INSERT INTO people_to_tasks (person_id, task_id) VALUES (%d, %d)", id, task.getId()));
+        new Database().executeStatement(String.format("INSERT INTO people_to_tasks (person_id, task_id) VALUES (%d, %d)", id, task.getId()));
     }
 
     /**
@@ -207,7 +207,7 @@ public class Person implements Comparable<Person>{
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      */
     public boolean exists() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }
@@ -220,7 +220,7 @@ public class Person implements Comparable<Person>{
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      */
     public static boolean exists(int id) throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }

@@ -1,7 +1,5 @@
 package armadillo.models;
 
-import javafx.beans.Observable;
-
 import javax.sql.rowset.CachedRowSet;
 import java.sql.*;
 import java.util.TreeSet;
@@ -31,7 +29,7 @@ public class Resource implements Comparable<Resource> {
     public Resource(String name) throws SQLException, ClassNotFoundException {
         if (name == null) throw new IllegalArgumentException("name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
-        id = Database.executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (\"%s\");", TABLE_NAME, name));
+        id = new Database().executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (\"%s\");", TABLE_NAME, name));
 
     }
 
@@ -63,7 +61,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public static TreeSet<Resource> getAllResources() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
         TreeSet<Resource> resources = new TreeSet<>();
         while (rs.next()) {
             resources.add(new Resource(rs.getInt("ID")));
@@ -78,7 +76,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public static void delete(int id) throws SQLException, ClassNotFoundException {
-        Database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+        new Database().executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
     }
 
     /**
@@ -87,7 +85,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public void delete() throws SQLException, ClassNotFoundException {
-        Database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+        new Database().executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
     }
 
     /**
@@ -110,7 +108,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ElementDoesNotExistException If the element has been deleted from the database
      */
     public String getName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT name FROM %s WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT name FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         rs.next();
         return rs.getString("name");
@@ -128,7 +126,7 @@ public class Resource implements Comparable<Resource> {
         if (name == null) throw new IllegalArgumentException("name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        Database.executeStatement(String.format("UPDATE %s SET name=\"%s\" WHERE ID=%d", TABLE_NAME, name, id));
+        new Database().executeStatement(String.format("UPDATE %s SET name=\"%s\" WHERE ID=%d", TABLE_NAME, name, id));
     }
 
     /**
@@ -138,7 +136,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
         try {
             while (rs.next()) {
@@ -161,7 +159,7 @@ public class Resource implements Comparable<Resource> {
     public void addTask(Task task) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (task == null) throw new IllegalArgumentException("task cannot be null");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        Database.executeStatement(String.format("INSERT INTO resource_to_task (resource_id, task_id) VALUES (%d, %d)", id, task.getId()));
+        new Database().executeStatement(String.format("INSERT INTO resource_to_task (resource_id, task_id) VALUES (%d, %d)", id, task.getId()));
     }
 
     /**
@@ -171,7 +169,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public boolean exists() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         return rs.next();
     }
 
@@ -183,7 +181,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public static boolean exists(int id) throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = Database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = new Database().executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         return rs.next();
     }
 

@@ -38,7 +38,7 @@ public class TestResource {
     public void testResourceCreationWithSQL() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource rs1 = new Resource("logs");
         Class.forName("org.sqlite.JDBC");
-        Connection conn = DriverManager.getConnection(Database.URL);
+        Connection conn = DriverManager.getConnection(Database.MAIN_URL);
         Statement sqlStatement = conn.createStatement();
         ResultSet rs = sqlStatement.executeQuery(String.format("SELECT name FROM resources WHERE id=%d", rs1.getId()));
         rs.next();
@@ -50,7 +50,7 @@ public class TestResource {
     @Test
     public void testGetNameAndGetResourceFromIDWithSQL() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Class.forName("org.sqlite.JDBC");
-        Connection conn = DriverManager.getConnection(Database.URL);
+        Connection conn = DriverManager.getConnection(Database.MAIN_URL);
         Statement sqlStatement = conn.createStatement();
         sqlStatement.execute("INSERT INTO resources(name) VALUES (\"logs\")");
         ResultSet rs = sqlStatement.getGeneratedKeys();
