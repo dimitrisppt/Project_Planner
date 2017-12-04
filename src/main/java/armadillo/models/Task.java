@@ -38,6 +38,7 @@ public class Task implements Comparable<Task>{
         return tasks;
     }
 
+<<<<<<< HEAD
     /**
      * Deletes this task from the database
      * @throws SQLException If there is an error with the SQL Statement, should not happen
@@ -50,6 +51,14 @@ public class Task implements Comparable<Task>{
 
     public static void deleteTask(int id) throws SQLException, ClassNotFoundException {
         new Database().executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+=======
+    public static void delete(int id) throws SQLException, ClassNotFoundException {
+        Database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+    }
+
+    public static void delete() throws SQLException, ClassNotFoundException {
+        Database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+>>>>>>> model-implementation
     }
 
     public int getId() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
@@ -91,6 +100,41 @@ public class Task implements Comparable<Task>{
     public void setEffortEstimate(long effortEstimate) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         new Database().executeStatement(String.format("UPDATE %s SET effort_estimate=%d WHERE ID=%d", TABLE_NAME, effortEstimate, id));
+    }
+
+    public TreeSet<Resource> getResources() throws SQLException, ClassNotFoundException {
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT resource_id FROM resource_to_task WHERE task_id=%d", id));
+        TreeSet<Resource> resources = new TreeSet<>();
+        try {
+            while (rs.next()) {
+                resources.add(Resource.getResourceByID(rs.getInt("resource_id")));
+            }
+        }
+        catch (ElementDoesNotExistException e) {
+            //Check if Ok
+        }
+        return resources;
+    }
+
+    public void addResource(Resource resource) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (resource == null) throw new IllegalArgumentException("resource cannot be null");
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        Database.executeStatement(String.format("INSERT INTO resource_to_task (resource_id, task_id) VALUES (%d, %d)", resource.getId(), id));
+    }
+
+    public TreeSet<Person> getPeople() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        CachedRowSet rs = Database.executeQuery(String.format("SELECT person_id FROM people_to_tasks WHERE task_id=%d", id));
+        TreeSet<Person> people = new TreeSet<>();
+        while (rs.next()) {
+            people.add(Person.getPersonByID(rs.getInt("person_id")));
+        }
+        return people;
+    }
+
+    public void addPerson(Person person) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (person == null) throw new IllegalArgumentException("Person cannot be null");
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        Database.executeStatement(String.format("INSERT INTO people_to_tasks (person_id, task_id) VALUES (%d, %d)", person.getId(), id));
     }
 
     public boolean exists() throws SQLException, ClassNotFoundException {
