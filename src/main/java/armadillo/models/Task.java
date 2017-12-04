@@ -8,10 +8,12 @@ import java.util.TreeSet;
 public class Task implements Comparable<Task>{
     private int id;
     public final static String TABLE_NAME = "tasks";
+    private Database database;
 
-    public Task(String name, String description, long effort_estimate) throws SQLException, ClassNotFoundException {
+    public Task(String name, String description, long effort_estimate, Database database) throws SQLException, ClassNotFoundException {
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
-        id = new Database().executeInsertStatement(String.format("INSERT INTO %s (name, description, effort_estimate) VALUES (\"%s\", \"%s\", \"%s\");", TABLE_NAME, name, description, effort_estimate));
+        this.database = database;
+        id = database.executeInsertStatement(String.format("INSERT INTO %s (name, description, effort_estimate) VALUES (\"%s\", \"%s\", \"%s\");", TABLE_NAME, name, description, effort_estimate));
     }
 
     private Task(int id) {
@@ -35,6 +37,16 @@ public class Task implements Comparable<Task>{
         }
         return tasks;
     }
+
+    /**
+     * Deletes this task from the database
+     * @throws SQLException If there is an error with the SQL Statement, should not happen
+     * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
+     */
+    public void delete() throws SQLException, ClassNotFoundException {
+        database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+    }
+
 
     public static void deleteTask(int id) throws SQLException, ClassNotFoundException {
         new Database().executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
