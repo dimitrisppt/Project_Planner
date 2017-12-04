@@ -33,7 +33,7 @@ public class Resource implements Comparable<Resource> {
         if (name == null) throw new IllegalArgumentException("name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         this.database = database;
-        id = database.executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (\"%s\");", TABLE_NAME, name));
+        id = database.executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (\"%s\")", TABLE_NAME, name));
 
     }
 
@@ -41,7 +41,7 @@ public class Resource implements Comparable<Resource> {
      * Creates a new Resource object referencing a ID in the database
      * @param id the id of the resource
      */
-    private Resource(int id, Database database) {
+    Resource(int id, Database database) {
         this.id = id;
         this.database = database;
     }
@@ -144,7 +144,7 @@ public class Resource implements Comparable<Resource> {
         CachedRowSet rs = database.executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
         while (rs.next()) {
-            tasks.add(new Task(id, database));
+            tasks.add(new Task(rs.getInt("task_id"), database));
         }
         return tasks;
     }
@@ -169,7 +169,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public boolean exists() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %s WHERE ID=%d", TABLE_NAME, id));
         return rs.next();
     }
 
@@ -181,7 +181,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public static boolean exists(int id, Database database) throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %s WHERE ID=%d", TABLE_NAME, id));
         return rs.next();
     }
 
