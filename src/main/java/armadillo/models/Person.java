@@ -34,15 +34,16 @@ public class Person implements Comparable<Person>{
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      * @throws IllegalArgumentException If one of the names is null or the length of the names is greater than 30, or if the name is not valid
      */
-    public Person(String firstName, String lastName) throws SQLException, ClassNotFoundException {
+    public Person(String firstName, String lastName, Database database) throws SQLException, ClassNotFoundException {
         if (firstName == null || lastName == null) throw new IllegalArgumentException("names cannot be null");
         if (firstName.length() > 30 || lastName.length() > 30)
             throw new IllegalArgumentException("names must be under 30 Characters in length");
         Pattern p = Pattern.compile("^([ \\u00c0-\\u01ffa-zA-Z'\\-])+$");
         Matcher m1 = p.matcher(firstName);
         Matcher m2 = p.matcher(lastName);
+        if (!m1.matches() || !m2.matches()) throw new IllegalArgumentException("Names must be valid names");
         this.database = database;
-        id = database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (\"%s\", \"%s\")", TABLE_NAME, first_name, last_name));
+        id = database.executeInsertStatement(String.format("INSERT INTO %s (first_name, last_name) VALUES (\"%s\", \"%s\")", TABLE_NAME, firstName, lastName));
     }
 
     /**
