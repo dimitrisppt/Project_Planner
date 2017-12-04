@@ -15,6 +15,11 @@ public class DatabaseTest {
     }
 
     @Test
+    public void testURLConstructorDoesNotThrowException() {
+        new Database(Database.MAIN_URL);
+    }
+
+    @Test
     public void testGetConnectionWorks() throws SQLException, ClassNotFoundException{
         Connection conn = new Database().getConnection();
         assertNotNull(conn);
