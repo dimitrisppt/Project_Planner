@@ -127,5 +127,18 @@ public class TaskIT {
         r2.delete();
         t1.delete();
     }
+
+    @Test
+    public void testAddPrerequisiteTaskAndGetPrerequisiteTasks() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Task t1 = new Task("Task One", "Long desc", 10200201, database);
+        Task t2 = new Task("Task Two", "Desc", 10202144, database);
+        t1.addPrerequisiteTask(t2);
+        TreeSet<Task> tasks = new TreeSet<>();
+        tasks.add(t2);
+        assertEquals(tasks, t1.getPrerequisiteTasks());
+        t1.delete();
+        t2.delete();
+    }
 }
+
 

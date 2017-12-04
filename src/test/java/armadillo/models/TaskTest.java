@@ -426,6 +426,55 @@ public class TaskTest {
     }
 
     @Test
+    public void testGetPrerequisiteTasksWhenNoTasks() throws SQLException, ClassNotFoundException {
+        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", \"B\", 1)")).thenReturn(1);
+        CachedRowSet crs = mock(CachedRowSet.class);
+        when(database.executeQuery("SELECT prereq_task_id FROM prereq_tasks WHERE this_task_id=1")).thenReturn(crs);
+        when(crs.next()).thenReturn(false);
+        Task t = new Task("A", "B", 1, database);
+        assertEquals(new TreeSet<Task>(), t.getPrerequisiteTasks());
+    }
+
+    @Test
+    public void testGetPrerequisiteTasksWhenTasksExist() throws SQLException, ClassNotFoundException {
+        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", \"B\", 1)")).thenReturn(1);
+        CachedRowSet crs = mock(CachedRowSet.class);
+        when(database.executeQuery("SELECT prereq_task_id FROM prereq_tasks WHERE this_task_id=1")).thenReturn(crs);
+        when(crs.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+        when(crs.getInt("prereq_task_id")).thenReturn(1).thenReturn(2);
+        Task t = new Task("A", "B", 1, database);
+        TreeSet<Task> tasks = new TreeSet<>();
+        tasks.add(new Task(1, database));
+        tasks.add(new Task(2, database));
+        assertEquals(tasks, t.getPrerequisiteTasks());
+    }
+
+    @Test(expected = ElementDoesNotExistException.class)
+    public void testAddPrerequisiteTaskWhenNotExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Task t1 = mock(Task.class);
+        Task t2 = Mockito.spy(new Task("A", "B", 1, database));
+        Mockito.doReturn(false).when(t2).exists();
+        t2.addPrerequisiteTask(t1);
+    }
+
+    @Test
+    public void testAddPrerequisiteTaskWhenExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Task t1 = mock(Task.class);
+        when(t1.getId()).thenReturn(2);
+        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", \"B\", 1)")).thenReturn(1);
+        Task t2 = Mockito.spy(new Task("A", "B", 1, database));
+        Mockito.doReturn(true).when(t2).exists();
+        t2.addPrerequisiteTask(t1);
+        verify(database).executeStatement("INSERT INTO prereq_tasks (this_task_id, prereq_task_id) VALUES (1, 2)");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPrerequisiteTaskWhenTaskIsNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Task t = new Task("A", "B", 1, database);
+        t.addPrerequisiteTask(null);
+    }
+
+    @Test
     public void testExistsWhenExists() throws SQLException, ClassNotFoundException {
         when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", \"B\", 1)")).thenReturn(1);
         CachedRowSet crs = mock(CachedRowSet.class);

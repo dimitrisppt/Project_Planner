@@ -145,6 +145,21 @@ public class Task implements Comparable<Task>{
         database.executeStatement(String.format("INSERT INTO people_to_tasks (person_id, task_id) VALUES (%d, %d)", person.getId(), id));
     }
 
+    public TreeSet<Task> getPrerequisiteTasks() throws SQLException, ClassNotFoundException {
+        CachedRowSet rs = database.executeQuery(String.format("SELECT prereq_task_id FROM prereq_tasks WHERE this_task_id=%d", id));
+        TreeSet<Task> tasks = new TreeSet<>();
+        while (rs.next()) {
+            tasks.add(new Task(rs.getInt("prereq_task_id"), database));
+        }
+        return tasks;
+    }
+
+    public void addPrerequisiteTask(Task prerequisiteTask) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (prerequisiteTask == null) throw new IllegalArgumentException("Task cannot be null");
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        database.executeStatement(String.format("INSERT INTO prereq_tasks (this_task_id, prereq_task_id) VALUES (%d, %d)", id, prerequisiteTask.getId()));
+    }
+
     public boolean exists() throws SQLException, ClassNotFoundException {
         CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
