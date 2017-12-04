@@ -17,6 +17,7 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.20.1'
+    testCompile 'org.mockito:mockito-core:2.7.22'
 }
 
 task createTaskDatabase {
@@ -29,7 +30,8 @@ task createTaskDatabase {
         	ID integer PRIMARY KEY AUTOINCREMENT,
         	name varchar(255) NOT NULL,
         	description text,
-        	effort_estimate integer NOT NULL
+        	effort_estimate integer NOT NULL,
+        	date_time integer
         );""")
 
         db.execute("""CREATE TABLE prereq_tasks (
@@ -38,13 +40,6 @@ task createTaskDatabase {
         	prereq_task_id integer NOT NULL,
           FOREIGN KEY(this_task_id) REFERENCES tasks(ID) ON DELETE CASCADE,
           FOREIGN KEY(prereq_task_id) REFERENCES tasks(ID) ON DELETE CASCADE
-        );""")
-
-        db.execute("""CREATE TABLE schedule (
-        	ID integer PRIMARY KEY AUTOINCREMENT,
-        	task_id integer NOT NULL,
-        	time integer NOT NULL,
-          FOREIGN KEY(task_id) REFERENCES tasks(ID) ON DELETE CASCADE
         );""")
 
         db.execute("""CREATE TABLE people (
@@ -75,6 +70,7 @@ task createTaskDatabase {
 }
 
 tasks.build.dependsOn(createTaskDatabase)
+tasks.testClasses.dependsOn(createTaskDatabase);
 
 task createTestDatabase {
     delete 'build/resources/test/test.db'
