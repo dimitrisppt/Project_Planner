@@ -89,7 +89,7 @@ public class ResourceTest {
     }
 
     @Test(expected = ElementDoesNotExistException.class)
-    public void testSetFirstNameWithValidDataAndNotExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+    public void testSetNameWithValidDataAndNotExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource r = Mockito.spy(new Resource("Data", database));
         Mockito.doReturn(false).when(r).exists();
         r.setName("Dog");
