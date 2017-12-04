@@ -1,6 +1,7 @@
 package armadillo.models;
 
 import javax.sql.rowset.CachedRowSet;
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.TreeSet;
 
@@ -19,6 +20,8 @@ public class Resource implements Comparable<Resource> {
      */
     public final static String TABLE_NAME = "resources";
 
+    private Database database;
+
     /**
      * Creates a new Resource
      * @param name the name of the resource, not nul
@@ -26,10 +29,11 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      * @throws IllegalArgumentException If name.length() &gt; 255 or name is null
      */
-    public Resource(String name) throws SQLException, ClassNotFoundException {
+    public Resource(String name, Database database) throws SQLException, ClassNotFoundException {
         if (name == null) throw new IllegalArgumentException("name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
-        id = new Database().executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (\"%s\");", TABLE_NAME, name));
+        this.database = database;
+        id = database.executeInsertStatement(String.format("INSERT INTO %s (name) VALUES (\"%s\");", TABLE_NAME, name));
 
     }
 
@@ -37,8 +41,9 @@ public class Resource implements Comparable<Resource> {
      * Creates a new Resource object referencing a ID in the database
      * @param id the id of the resource
      */
-    private Resource(int id) {
+    private Resource(int id, Database database) {
         this.id = id;
+        this.database = database;
     }
 
     /**
@@ -49,9 +54,9 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      * @throws ElementDoesNotExistException If the element has been deleted from the database
      */
-    public static Resource getResourceByID(int id) throws SQLException, ClassNotFoundException, ElementDoesNotExistException{
-        if (!exists(id)) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        return new Resource(id);
+    public static Resource getResourceByID(int id, Database database) throws SQLException, ClassNotFoundException, ElementDoesNotExistException{
+        if (!exists(id, database)) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        return new Resource(id, database);
     }
 
     /**
@@ -60,11 +65,11 @@ public class Resource implements Comparable<Resource> {
      * @throws SQLException If the SQL statement is not valid, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
-    public static TreeSet<Resource> getAllResources() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = new Database().executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
+    public static TreeSet<Resource> getAllResources(Database database) throws SQLException, ClassNotFoundException {
+        CachedRowSet rs = database.executeQuery(String.format("SELECT id FROM %s", TABLE_NAME));
         TreeSet<Resource> resources = new TreeSet<>();
         while (rs.next()) {
-            resources.add(new Resource(rs.getInt("ID")));
+            resources.add(new Resource(rs.getInt("ID"), database));
         }
         return resources;
     }
@@ -75,8 +80,8 @@ public class Resource implements Comparable<Resource> {
      * @throws SQLException If the SQL statement is not valid, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
-    public static void delete(int id) throws SQLException, ClassNotFoundException {
-        new Database().executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+    public static void delete(int id, Database database) throws SQLException, ClassNotFoundException {
+        database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
     }
 
     /**
@@ -85,7 +90,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public void delete() throws SQLException, ClassNotFoundException {
-        new Database().executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
+        database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
     }
 
     /**
@@ -108,7 +113,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ElementDoesNotExistException If the element has been deleted from the database
      */
     public String getName() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
-        CachedRowSet rs = new Database().executeQuery(String.format("SELECT name FROM %s WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = database.executeQuery(String.format("SELECT name FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         rs.next();
         return rs.getString("name");
@@ -126,7 +131,7 @@ public class Resource implements Comparable<Resource> {
         if (name == null) throw new IllegalArgumentException("name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        new Database().executeStatement(String.format("UPDATE %s SET name=\"%s\" WHERE ID=%d", TABLE_NAME, name, id));
+        database.executeStatement(String.format("UPDATE %s SET name=\"%s\" WHERE ID=%d", TABLE_NAME, name, id));
     }
 
     /**
@@ -136,15 +141,10 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public TreeSet<Task> getTasks() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = new Database().executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
+        CachedRowSet rs = database.executeQuery(String.format("SELECT task_id FROM resource_to_task WHERE resource_id=%d", id));
         TreeSet<Task> tasks = new TreeSet<>();
-        try {
-            while (rs.next()) {
-                tasks.add(Task.getTaskByID(rs.getInt("task_id")));
-            }
-        }
-        catch (ElementDoesNotExistException e) {
-            //Check if Ok
+        while (rs.next()) {
+            tasks.add(new Task(id, database));
         }
         return tasks;
     }
@@ -159,7 +159,7 @@ public class Resource implements Comparable<Resource> {
     public void addTask(Task task) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (task == null) throw new IllegalArgumentException("task cannot be null");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
-        new Database().executeStatement(String.format("INSERT INTO resource_to_task (resource_id, task_id) VALUES (%d, %d)", id, task.getId()));
+        database.executeStatement(String.format("INSERT INTO resource_to_task (resource_id, task_id) VALUES (%d, %d)", id, task.getId()));
     }
 
     /**
@@ -169,7 +169,7 @@ public class Resource implements Comparable<Resource> {
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
     public boolean exists() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = new Database().executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         return rs.next();
     }
 
@@ -180,8 +180,8 @@ public class Resource implements Comparable<Resource> {
      * @throws SQLException If the SQL statement is not valid, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not in the classpath
      */
-    public static boolean exists(int id) throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = new Database().executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+    public static boolean exists(int id, Database database) throws SQLException, ClassNotFoundException {
+        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
         return rs.next();
     }
 
