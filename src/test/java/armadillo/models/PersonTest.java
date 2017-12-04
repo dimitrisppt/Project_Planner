@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import sun.reflect.generics.tree.Tree;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -51,6 +50,16 @@ public class PersonTest {
         new Person("Robert", sb.toString(), database);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testPersonConstructorWhenFirstNameIsNotValid() throws SQLException, ClassNotFoundException {
+        new Person("R@A22", "Greener", database);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPersonConstructorWhenLastNameIsNotValid() throws SQLException, ClassNotFoundException {
+        new Person("Robert", "Gre@ene", database);
+    }
+
     @Test
     public void testPersonConstructorWithValidData() throws SQLException, ClassNotFoundException {
         Person p = new Person("Robert", "Greener", database);
@@ -67,6 +76,18 @@ public class PersonTest {
     public void testSetLastNameWhenNameIsNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Person p = new Person("Robert", "Greener", database);
         p.setLastName(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetFirstNameWhenNameIsNotValid() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Person p = new Person("Robert", "Greener", database);
+        p.setFirstName("R@b*ert");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetLastNameWhenNameIsNotValid() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Person p = new Person("Robert", "Greener", database);
+        p.setLastName("G&reber");
     }
 
     @Test(expected = IllegalArgumentException.class)
