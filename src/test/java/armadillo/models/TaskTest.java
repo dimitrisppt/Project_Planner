@@ -37,9 +37,15 @@ public class TaskTest {
     }
 
     @Test
-    public void testConstructorWhenValid() throws SQLException, ClassNotFoundException {
+    public void testConstructorWhenValidAndDescIsNotNull() throws SQLException, ClassNotFoundException {
         Task t = new Task("Test", "This is a test task", 100, database);
         verify(database).executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"Test\", \"This is a test task\", 100)");
+    }
+
+    @Test
+    public void testConstructorWhenValidAndDescIsNull() throws SQLException, ClassNotFoundException {
+        Task t = new Task("Test", null, 100, database);
+        verify(database).executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"Test\", null, 100)");
     }
 
     @Test
@@ -163,7 +169,7 @@ public class TaskTest {
     }
 
     @Test
-    public void testGetDescriptionWhenExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+    public void testGetDescriptionWhenExistsAndNotNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         CachedRowSet crs = mock(CachedRowSet.class);
         when(database.executeQuery("SELECT description FROM tasks WHERE ID=1")).thenReturn(crs);
         when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", \"B\", 1)")).thenReturn(1);
@@ -171,6 +177,17 @@ public class TaskTest {
         when(crs.getString("description")).thenReturn("B");
         Mockito.doReturn(true).when(t).exists();
         assertEquals("B", t.getDescription());
+    }
+
+    @Test
+    public void testGetDescriptionWhenExistsAndNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        CachedRowSet crs = mock(CachedRowSet.class);
+        when(database.executeQuery("SELECT description FROM tasks WHERE ID=1")).thenReturn(crs);
+        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", null, 1)")).thenReturn(1);
+        Task t = Mockito.spy(new Task("A", null, 1, database));
+        when(crs.getString("description")).thenReturn(null);
+        Mockito.doReturn(true).when(t).exists();
+        assertEquals(null, t.getDescription());
     }
 
     @Test(expected = ElementDoesNotExistException.class)

@@ -14,7 +14,7 @@ public class Task implements Comparable<Task>{
         if (name == null) throw new IllegalArgumentException("Name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         this.database = database;
-        id = database.executeInsertStatement(String.format("INSERT INTO %s (name, description, effort_estimate) VALUES (\"%s\", \"%s\", %d)", TABLE_NAME, name, description, effort_estimate));
+        id = database.executeInsertStatement(String.format("INSERT INTO %s (name, description, effort_estimate) VALUES (\"%s\", \"%s\", %d)", TABLE_NAME, name, description, effort_estimate).replace("\"null\"", "null"));
     }
 
     Task(int id, Database database) {
