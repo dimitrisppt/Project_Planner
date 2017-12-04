@@ -11,13 +11,15 @@ public class Task implements Comparable<Task>{
     private Database database;
 
     public Task(String name, String description, long effort_estimate, Database database) throws SQLException, ClassNotFoundException {
+        if (name == null) throw new IllegalArgumentException("Name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         this.database = database;
-        id = database.executeInsertStatement(String.format("INSERT INTO %s (name, description, effort_estimate) VALUES (\"%s\", \"%s\", \"%s\");", TABLE_NAME, name, description, effort_estimate));
+        id = database.executeInsertStatement(String.format("INSERT INTO %s (name, description, effort_estimate) VALUES (\"%s\", \"%s\", %d)", TABLE_NAME, name, description, effort_estimate));
     }
 
     Task(int id, Database database) {
         this.id = id;
+        this.database = database;
     }
 
     public static Task getTaskByID(int id, Database database) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
@@ -44,7 +46,7 @@ public class Task implements Comparable<Task>{
     }
 
 
-    public static void deleteTask(int id, Database database) throws SQLException, ClassNotFoundException {
+    public static void delete(int id, Database database) throws SQLException, ClassNotFoundException {
         database.executeStatement(String.format("DELETE FROM %s WHERE ID=%d", TABLE_NAME, id));
     }
 
@@ -61,6 +63,7 @@ public class Task implements Comparable<Task>{
     }
 
     public void setName(String name) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (name == null) throw new IllegalArgumentException("name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         database.executeStatement(String.format("UPDATE %s SET name=\"%s\" WHERE ID=%d", TABLE_NAME, name, id));
@@ -94,7 +97,7 @@ public class Task implements Comparable<Task>{
         CachedRowSet rs = database.executeQuery(String.format("SELECT resource_id FROM resource_to_task WHERE task_id=%d", id));
         TreeSet<Resource> resources = new TreeSet<>();
         while (rs.next()) {
-            resources.add(new Resource(id, database));
+            resources.add(new Resource(rs.getInt("resource_id"), database));
         }
         return resources;
     }
@@ -105,7 +108,7 @@ public class Task implements Comparable<Task>{
         database.executeStatement(String.format("INSERT INTO resource_to_task (resource_id, task_id) VALUES (%d, %d)", resource.getId(), id));
     }
 
-    public TreeSet<Person> getPeople() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+    public TreeSet<Person> getPeople() throws SQLException, ClassNotFoundException {
         CachedRowSet rs = database.executeQuery(String.format("SELECT person_id FROM people_to_tasks WHERE task_id=%d", id));
         TreeSet<Person> people = new TreeSet<>();
         while (rs.next()) {
@@ -121,13 +124,13 @@ public class Task implements Comparable<Task>{
     }
 
     public boolean exists() throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }
 
     public static boolean exists(int id, Database database) throws SQLException, ClassNotFoundException {
-        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %S WHERE ID=%d", TABLE_NAME, id));
+        CachedRowSet rs = database.executeQuery(String.format("SELECT * FROM %s WHERE ID=%d", TABLE_NAME, id));
         if (!rs.next()) return false;
         return true;
     }
