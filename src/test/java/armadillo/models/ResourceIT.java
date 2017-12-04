@@ -32,7 +32,7 @@ public class ResourceIT {
     }
 
     @Test
-    public void testGetAllPeople() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+    public void testGetAllResources() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         TreeSet<Resource> resources = Resource.getAllResources(database);
         resources.add(new Resource("Dogs", database));
         resources.add(new Resource("Logs", database));
