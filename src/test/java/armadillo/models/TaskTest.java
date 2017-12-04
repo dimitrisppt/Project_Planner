@@ -48,6 +48,32 @@ public class TaskTest {
         verify(database).executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"Test\", null, 100)");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testDateTimeConstructorWhenNameIsNull() throws SQLException, ClassNotFoundException {
+        new Task(null, "Test", 100, 1002L, database);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDateTimeConstructorWhenNameIsTooLong() throws SQLException, ClassNotFoundException {
+        StringBuilder sb = new StringBuilder();
+        for (int i =  0; i <= 255; i++) {
+            sb.append('a');
+        }
+        new Task(sb.toString(), "Test", 100, 1002L, database);
+    }
+
+    @Test
+    public void testDateTimeConstructorWhenValidAndDescIsNotNull() throws SQLException, ClassNotFoundException {
+        Task t = new Task("Test", "This is a test task", 100, 1002L, database);
+        verify(database).executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate, date_time) VALUES (\"Test\", \"This is a test task\", 100, 1002)");
+    }
+
+    @Test
+    public void testDateTimeConstructorWhenValidAndDescIsNull() throws SQLException, ClassNotFoundException {
+        Task t = new Task("Test", null, 100, 1002L, database);
+        verify(database).executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate, date_time) VALUES (\"Test\", null, 100, 1002)");
+    }
+
     @Test
     public void testPackagePrivateConstructorDoesNotThrowException() throws SQLException, ClassNotFoundException {
         new Task(1, database);
@@ -116,6 +142,60 @@ public class TaskTest {
         Task t = Mockito.spy(new Task("A", "B", 1, database));
         Mockito.doReturn(false).when(t).exists();
         t.getId();
+    }
+
+    @Test
+    public void testSetDateTimeNotNullWhenExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", \"B\", 1)")).thenReturn(1);
+        Task t = Mockito.spy(new Task("A", "B", 1, database));
+        Mockito.doReturn(true).when(t).exists();
+        t.setDateTime(5L);
+        verify(database).executeStatement("UPDATE tasks SET date_time=5 WHERE ID=1");
+    }
+
+    @Test
+    public void testSetDateTimeNullWhenExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate, date_time) VALUES (\"A\", \"B\", 1, 5)")).thenReturn(1);
+        Task t = Mockito.spy(new Task("A", "B", 1, 5L, database));
+        Mockito.doReturn(true).when(t).exists();
+        t.setDateTime(null);
+        verify(database).executeStatement("UPDATE tasks SET date_time=null WHERE ID=1");
+    }
+
+    @Test(expected = ElementDoesNotExistException.class)
+    public void testSetDateTimeWhenNotExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Task t = Mockito.spy(new Task("A", "B", 1, database));
+        Mockito.doReturn(false).when(t).exists();
+        t.setDateTime(5L);
+    }
+
+    @Test
+    public void testGetDateTimeWhenExistsAndNotNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        CachedRowSet crs = mock(CachedRowSet.class);
+        when(database.executeQuery("SELECT date_time FROM tasks WHERE ID=1")).thenReturn(crs);
+        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate, date_time) VALUES (\"A\", \"B\", 1, 5)")).thenReturn(1);
+        Task t = Mockito.spy(new Task("A", "B", 1, 5L, database));
+        when(crs.getLong("date_time")).thenReturn(5L);
+        Mockito.doReturn(true).when(t).exists();
+        assertEquals(new Long(5L), t.getDateTime());
+    }
+
+    @Test
+    public void testGetDateTimeWhenExistsAndNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        CachedRowSet crs = mock(CachedRowSet.class);
+        when(database.executeQuery("SELECT date_time FROM tasks WHERE ID=1")).thenReturn(crs);
+        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", \"B\", 1)")).thenReturn(1);
+        Task t = Mockito.spy(new Task("A", "B", 1, database));
+        when(crs.getLong("date_time")).thenReturn(0L);
+        Mockito.doReturn(true).when(t).exists();
+        assertEquals(null, t.getDateTime());
+    }
+
+    @Test(expected = ElementDoesNotExistException.class)
+    public void testGetDateTimeWhenNotExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Task t = Mockito.spy(new Task("A", "B", 1, database));
+        Mockito.doReturn(false).when(t).exists();
+        t.getDateTime();
     }
 
     @Test

@@ -13,7 +13,7 @@ public class TaskIT {
     @Test
     public void testResourceConstructorWithValidNamesThenGettersAndDeleteAndExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException{
         Task t1 = new Task("A", "B", 1, database);
-        Task t2 = new Task("C", null, 5, database);
+        Task t2 = new Task("C", null, 5, 1002L, database);
         int t1Id = t1.getId();
         int t2Id = t2.getId();
         assertEquals("A", t1.getName());
@@ -22,6 +22,8 @@ public class TaskIT {
         assertEquals(null, t2.getDescription());
         assertEquals(1, t1.getEffortEstimate());
         assertEquals(5, t2.getEffortEstimate());
+        assertEquals(null, t1.getDateTime());
+        assertEquals(new Long(1002L), t2.getDateTime());
         assertTrue(t1.exists());
         assertTrue(t2.exists());
         assertTrue(Task.exists(t1Id, database));
@@ -55,6 +57,22 @@ public class TaskIT {
         Task t = new Task("A", "B", 1, database);
         t.setEffortEstimate(5);
         assertEquals(5L, t.getEffortEstimate());
+        Task.delete(t.getId(), database);
+    }
+
+    @Test
+    public void testSetDateTimeToNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Task t = new Task("A", "B", 1, 1002L, database);
+        t.setDateTime(null);
+        assertEquals(null, t.getDateTime());
+        Task.delete(t.getId(), database);
+    }
+
+    @Test
+    public void testSetDateTimeToNotNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        Task t = new Task("A", "B", 1, 1002L, database);
+        t.setDateTime(500L);
+        assertEquals(new Long(500L), t.getDateTime());
         Task.delete(t.getId(), database);
     }
 

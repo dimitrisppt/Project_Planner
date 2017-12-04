@@ -10,11 +10,19 @@ public class Task implements Comparable<Task>{
     public final static String TABLE_NAME = "tasks";
     private Database database;
 
+    public Task(String name, String description, long effort_estimate, Long date_time, Database database) throws SQLException, ClassNotFoundException {
+        if (name == null) throw new IllegalArgumentException("Name cannot be null");
+        if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
+        this.database = database;
+        id = database.executeInsertStatement(String.format("INSERT INTO %s (name, description, effort_estimate, date_time) VALUES (\"%s\", \"%s\", %d, %s)", TABLE_NAME, name, description, effort_estimate, date_time).replace("\"null\"", "null"));
+    }
+
     public Task(String name, String description, long effort_estimate, Database database) throws SQLException, ClassNotFoundException {
         if (name == null) throw new IllegalArgumentException("Name cannot be null");
         if (name.length() > 255) throw new IllegalArgumentException("name must be under 255 chars");
         this.database = database;
         id = database.executeInsertStatement(String.format("INSERT INTO %s (name, description, effort_estimate) VALUES (\"%s\", \"%s\", %d)", TABLE_NAME, name, description, effort_estimate).replace("\"null\"", "null"));
+
     }
 
     Task(int id, Database database) {
@@ -91,6 +99,20 @@ public class Task implements Comparable<Task>{
     public void setEffortEstimate(long effortEstimate) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
         database.executeStatement(String.format("UPDATE %s SET effort_estimate=%d WHERE ID=%d", TABLE_NAME, effortEstimate, id));
+    }
+
+    public void setDateTime(Long dateTime) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        database.executeStatement(String.format("UPDATE %s SET date_time=%s WHERE ID=%d", TABLE_NAME, dateTime, id));
+    }
+
+    public Long getDateTime() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        CachedRowSet rs = database.executeQuery(String.format("SELECT date_time FROM %s WHERE ID=%d", TABLE_NAME, id));
+        if (!exists()) throw new ElementDoesNotExistException(TABLE_NAME, id);
+        rs.next();
+        long result = rs.getLong("date_time");
+        if (result == 0) return null;
+        else return result;
     }
 
     public TreeSet<Resource> getResources() throws SQLException, ClassNotFoundException {
