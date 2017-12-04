@@ -8,7 +8,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class TestDatabase {
+public class DatabaseTest {
     @Test
     public void testConstructorDoesNotThrowException() {
         new Database();
