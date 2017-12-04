@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class PersonIT {
 
-    private Database database = new Database();
+    private Database database = new Database("jdbc:sqlite:build/resources/test/tasks.db");
 
     @Test
     public void testPersonConstructorWithValidNamesThenGettersAndDeleteAndExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException{

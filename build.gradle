@@ -20,13 +20,9 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.7.22'
 }
 
-task createTaskDatabase {
-    delete 'build/resources/main/tasks.db'
-    def databaseFile = file("build/resources/main/tasks.db")
-    outputs.file(databaseFile)
-    doLast {
-        def db = openSQLiteDatabase(databaseFile)
-        db.execute("""CREATE TABLE tasks (
+def createDatabase(databaseFile) {
+    def db = openSQLiteDatabase(databaseFile)
+    db.execute("""CREATE TABLE tasks (
         	ID integer PRIMARY KEY AUTOINCREMENT,
         	name varchar(255) NOT NULL,
         	description text,
@@ -34,7 +30,7 @@ task createTaskDatabase {
         	date_time integer
         );""")
 
-        db.execute("""CREATE TABLE prereq_tasks (
+    db.execute("""CREATE TABLE prereq_tasks (
         	ID integer PRIMARY KEY AUTOINCREMENT,
         	this_task_id integer NOT NULL,
         	prereq_task_id integer NOT NULL,
@@ -42,13 +38,13 @@ task createTaskDatabase {
           FOREIGN KEY(prereq_task_id) REFERENCES tasks(ID) ON DELETE CASCADE
         );""")
 
-        db.execute("""CREATE TABLE people (
+    db.execute("""CREATE TABLE people (
         	ID integer PRIMARY KEY AUTOINCREMENT,
         	first_name varchar(30) NOT NULL,
         	last_name varchar(30) NOT NULL
         );""")
 
-        db.execute("""CREATE TABLE people_to_tasks (
+    db.execute("""CREATE TABLE people_to_tasks (
         	ID integer PRIMARY KEY AUTOINCREMENT,
         	person_id integer NOT NULL,
         	task_id integer NOT NULL,
@@ -56,31 +52,35 @@ task createTaskDatabase {
           FOREIGN KEY(task_id) REFERENCES tasks(ID) ON DELETE CASCADE
         );""")
 
-        db.execute("""CREATE TABLE resources (
+    db.execute("""CREATE TABLE resources (
             ID integer PRIMARY KEY AUTOINCREMENT,
             name varchar(255) NOT NULL);""")
 
-        db.execute("""CREATE TABLE resource_to_task (
+    db.execute("""CREATE TABLE resource_to_task (
             ID integer PRIMARY KEY AUTOINCREMENT,
             resource_id integer NOT NULL,
             task_id integer NOT NULL,
           FOREIGN KEY(resource_id) REFERENCES resources(ID) ON DELETE CASCADE,
           FOREIGN KEY(task_id) REFERENCES tasks(ID) ON DELETE CASCADE);""")
+}
+
+task createTaskDatabase {
+    delete 'build/resources/main/tasks.db'
+    def databaseFile = file("build/resources/main/tasks.db")
+    outputs.file(databaseFile)
+    doLast {
+        createDatabase(databaseFile)
     }
 }
 
 tasks.build.dependsOn(createTaskDatabase)
-tasks.testClasses.dependsOn(createTaskDatabase);
 
 task createTestDatabase {
-    delete 'build/resources/test/test.db'
-    def databaseFile = file("build/resources/test/test.db")
+    delete 'build/resources/test/tasks.db'
+    def databaseFile = file("build/resources/test/tasks.db")
     outputs.file(databaseFile)
     doLast {
-        def db = openSQLiteDatabase(databaseFile)
-        db.execute("CREATE TABLE names (name TEXT NOT NULL)")
-        db.execute("INSERT INTO names VALUES ('Robert')")
-        db.execute("INSERT INTO names VALUES ('Tom')")
+        createDatabase(databaseFile)
     }
 }
 tasks.testClasses.dependsOn(createTestDatabase)
