@@ -3,7 +3,7 @@ package armadillo.models;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-public class TestElementDoesNotExistException {
+public class ElementDoesNotExistExceptionTest {
     @Test
     public void testMessage() {
         try {
