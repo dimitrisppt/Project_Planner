@@ -42,6 +42,11 @@ public class ResourceTest {
         verify(database).executeInsertStatement("INSERT INTO resources (name) VALUES (\"Data\")");
     }
 
+    @Test
+    public void testPackagePrivateConstructorDoesNotThrowException() {
+        new Resource(1, database);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testSetNameWhenNameIsNull() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         Resource r = new Resource("Data", database);

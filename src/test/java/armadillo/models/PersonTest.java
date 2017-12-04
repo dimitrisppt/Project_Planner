@@ -61,6 +61,11 @@ public class PersonTest {
     }
 
     @Test
+    public void testPackagePrivateConstructorDoesNotThrowException() {
+        new Person(1, database);
+    }
+
+    @Test
     public void testPersonConstructorWithValidData() throws SQLException, ClassNotFoundException {
         Person p = new Person("Robert", "Greener", database);
         verify(database).executeInsertStatement("INSERT INTO people (first_name, last_name) VALUES (\"Robert\", \"Greener\")");
