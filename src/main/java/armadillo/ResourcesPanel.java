@@ -16,6 +16,7 @@ public class ResourcesPanel {
 
     private Button resourcesButton;
 
+
     public ResourcesPanel(Button resourcesButton) {
 
         this.resourcesButton = resourcesButton;
@@ -25,10 +26,11 @@ public class ResourcesPanel {
 
             @Override
             public void handle(ActionEvent event) {
-                Label recourseLabel = new Label("Enter Resource: ");
+                Label resourceLabel = new Label("Enter Resource: ");
 
-                TextField recourseField = new TextField();
-                recourseField.setMaxSize(200,25);
+                TextField resourceField = new TextField();
+                resourceField.setId("resourceField");
+                resourceField.setMaxSize(200,25);
 
                 ObservableList<String> resource = FXCollections.observableArrayList (
                         "Resource #1", "Resource #2");
@@ -39,8 +41,8 @@ public class ResourcesPanel {
                 dialog.initModality(Modality.APPLICATION_MODAL);
                 VBox dialogVbox = new VBox(20);
                 dialogVbox.setPadding(new Insets(25,25,25,25));
-                dialogVbox.getChildren().add(recourseLabel);
-                dialogVbox.getChildren().add(recourseField);
+                dialogVbox.getChildren().add(resourceLabel);
+                dialogVbox.getChildren().add(resourceField);
                 dialogVbox.getChildren().add(listOfResources);
 
                 Scene dialogScene = new Scene(dialogVbox, 500, 500);

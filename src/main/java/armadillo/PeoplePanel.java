@@ -28,6 +28,7 @@ public class PeoplePanel {
                     Label nameLabel = new Label("Enter Name: ");
 
                     TextField nameField = new TextField();
+                    nameField.setId("nameField");
                     nameField.setMaxSize(200,25);
 
 

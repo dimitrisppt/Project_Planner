@@ -1,25 +1,15 @@
 package armadillo;
 
-import com.sun.javafx.scene.control.skin.DatePickerContent;
-import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 
@@ -37,39 +27,46 @@ public class View extends Application{
 		// Initialise object of the main scene
 		primaryStage.setTitle("Project Planner");
 		
-		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(25,25,25,25));
-		Scene scene = new Scene(grid, 600, 475);
+		BorderPane pane = new BorderPane();
+		pane.setPadding(new Insets(25,25,25,25));
+		Scene scene = new Scene(pane, 600, 475);
 		primaryStage.setScene(scene);
-		
+
 		Text scenetitle = new Text("Welcome");
 		scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		grid.add(scenetitle, 0, 0, 2, 1);
-		
+
 		Button task = new Button("Enter Task");
-		grid.add(task, 0, 1);
-		
+
 		Button people = new Button("Add People");
-		grid.add(people, 1, 1);
 
 		Button resource = new Button("Add Resources");
-		grid.add(resource, 2, 1);
+
+
+		HBox hTop = new HBox();
+		hTop.setSpacing(15);
+		hTop.setAlignment(Pos.CENTER);
+		hTop.getChildren().addAll(task, people, resource);
+
+		BorderPane topPane = new BorderPane();
+		Button refreshButton = new Button("Refresh");
+		refreshButton.setAlignment(Pos.BOTTOM_LEFT);
+		topPane.setCenter(hTop);
+		topPane.setBottom(refreshButton);
+
+
+		pane.setTop(topPane);
+		pane.setCenter(scenetitle);
+
 
 		TaskPanel taskPanel = new TaskPanel(task);
 		PeoplePanel peoplePanel = new PeoplePanel(people);
 		ResourcesPanel resourcesPanel = new ResourcesPanel(resource);
 
-		
+
 		primaryStage.show();
 		
     }
 
-    public void createCalendar() {
-
-	}
 
 
     

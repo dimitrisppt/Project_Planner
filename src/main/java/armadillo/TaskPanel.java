@@ -29,6 +29,9 @@ public class TaskPanel {
             public void handle(ActionEvent event) {
 
                 Button submit = new Button("Submit");
+
+                submit.setId("submitButton");
+
                 submit.setStyle("-fx-font-weight: bold");
 
                 Label personInstructions = new Label("Select people to assign to task.");
@@ -40,18 +43,26 @@ public class TaskPanel {
 
                 Label taskLabel = new Label("Task Name:");
                 taskLabel.setStyle("-fx-font-weight: bold");
+
+                resourcesField.setId("resourcesField");
+
                 // taskLabel.setAlignment(Pos.TOP_LEFT);
 
                 TextField taskField = new TextField();
                 //taskField.setAlignment(Pos.TOP_CENTER);
                 taskField.setMaxSize(200,25);
 
+                taskField.setId("taskField");
+
                 Label taskDescription = new Label("Task Description:");
                 taskDescription.setStyle("-fx-font-weight: bold");
+
 
                 TextArea descriptionArea = new TextArea();
                 descriptionArea.setWrapText(true);
                 descriptionArea.setMaxSize(200,50);
+                descriptionArea.setId("taskDescArea");
+
 
                 Label spinnerLabelHours = new Label("Hours:");
                 Label spinnerLabelMins = new Label("Minutes:");
@@ -62,7 +73,9 @@ public class TaskPanel {
 
                 Spinner<Integer> spinnerMins = new Spinner<Integer>();
                 int initialValueMins = 0;
-                SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueHours);
+
+                SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueMins);
+
 
                 spinnerHours.setValueFactory(valueFactoryHours);
                 spinnerMins.setValueFactory(valueFactoryMins);
