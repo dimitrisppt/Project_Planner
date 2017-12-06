@@ -1,9 +1,9 @@
-package armadillo;
+package armadillo.views;
 
+import armadillo.views.PeoplePanel;
+import armadillo.views.ResourcesPanel;
+import armadillo.views.TaskPanel;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

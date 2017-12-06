@@ -1,4 +1,4 @@
-package armadillo;
+package armadillo.views;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,26 +16,32 @@ public class ResourcesPanel {
 
     private Button resourcesButton;
 
-
     public ResourcesPanel(Button resourcesButton) {
 
         this.resourcesButton = resourcesButton;
 
-        // ------------- Change to MVC ---------------
+
         resourcesButton.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
+
                 Label resourceLabel = new Label("Enter Resource: ");
+
+
 
                 TextField resourceField = new TextField();
                 resourceField.setId("resourceField");
                 resourceField.setMaxSize(200,25);
 
+
+
                 ObservableList<String> resource = FXCollections.observableArrayList (
                         "Resource #1", "Resource #2");
                 ListView<String> listOfResources = new ListView<String>(resource);
                 listOfResources.setCellFactory(param -> new resourcesCell());
+
+
 
                 final Stage dialog = new Stage();
                 dialog.initModality(Modality.APPLICATION_MODAL);
@@ -44,6 +50,8 @@ public class ResourcesPanel {
                 dialogVbox.getChildren().add(resourceLabel);
                 dialogVbox.getChildren().add(resourceField);
                 dialogVbox.getChildren().add(listOfResources);
+
+
 
                 Scene dialogScene = new Scene(dialogVbox, 500, 500);
                 dialog.setScene(dialogScene);
@@ -55,11 +63,13 @@ public class ResourcesPanel {
     }
 
     static class resourcesCell extends ListCell<String> {
+
         HBox hbox = new HBox();
         Button button = new Button("Delete");
         Label label = new Label("");
 
         public resourcesCell(){
+
             super();
             hbox.setSpacing(5);
             hbox.getChildren().addAll(label, button);
@@ -67,11 +77,15 @@ public class ResourcesPanel {
 
         @Override
         public void updateItem(String item, boolean empty) {
+
             super.updateItem(item, empty);
+
             if (empty) {
+
                 setText(null);
                 setGraphic(null);
             } else {
+
                 label.setText(item);
                 setGraphic(hbox);
             }
