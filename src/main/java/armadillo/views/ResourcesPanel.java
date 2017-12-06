@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -20,6 +21,12 @@ public class ResourcesPanel extends Stage {
         Label resourceLabel = new Label("Enter Resource: ");
 
 
+        Button submit = new Button("Submit");
+        submit.setId("submitResourceButton");
+        submit.setStyle("-fx-font-weight: bold");
+
+        BorderPane buttonPane = new BorderPane();
+        buttonPane.setRight(submit);
 
         TextField resourceField = new TextField();
         resourceField.setId("resourceField");
@@ -40,6 +47,7 @@ public class ResourcesPanel extends Stage {
         dialogVbox.getChildren().add(resourceLabel);
         dialogVbox.getChildren().add(resourceField);
         dialogVbox.getChildren().add(listOfResources);
+        dialogVbox.getChildren().add(buttonPane);
 
 
 

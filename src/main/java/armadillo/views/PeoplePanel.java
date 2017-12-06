@@ -5,10 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -22,6 +19,13 @@ public class PeoplePanel extends Stage{
 
         TextField nameField = new TextField();
         TextField surnameField = new TextField();
+
+        Button submit = new Button("Submit");
+        submit.setId("submitPeopleButton");
+        submit.setStyle("-fx-font-weight: bold");
+
+        BorderPane buttonPane = new BorderPane();
+        buttonPane.setRight(submit);
 
         nameField.setId("nameField");
         surnameField.setId("surnameField");
@@ -52,8 +56,7 @@ public class PeoplePanel extends Stage{
         dialogVbox.getChildren().add(nameHBox);
         dialogVbox.getChildren().add(surnameHBox);
         dialogVbox.getChildren().add(listOfPeople);
-
-
+        dialogVbox.getChildren().add(buttonPane);
 
         Scene dialogScene = new Scene(dialogVbox, 500, 500);
         this.setScene(dialogScene);
