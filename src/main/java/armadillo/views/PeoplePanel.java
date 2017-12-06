@@ -18,11 +18,15 @@ public class PeoplePanel extends Stage{
 
 
         Label nameLabel = new Label("Enter Name: ");
-
+        Label surnameLabel = new Label("Enter Surname: ");
 
         TextField nameField = new TextField();
+        TextField surnameField = new TextField();
+
         nameField.setId("nameField");
+        surnameField.setId("surnameField");
         nameField.setMaxSize(200,25);
+        surnameField.setMaxSize(200,25);
 
 
 
@@ -35,9 +39,18 @@ public class PeoplePanel extends Stage{
 
         this.initModality(Modality.APPLICATION_MODAL);
         VBox dialogVbox = new VBox(20);
+        HBox nameHBox = new HBox();
+        HBox surnameHBox = new HBox();
+
+        nameHBox.setSpacing(30);
+        surnameHBox.setSpacing(15);
+
+        nameHBox.getChildren().addAll(nameLabel, nameField);
+        surnameHBox.getChildren().addAll(surnameLabel, surnameField);
+
         dialogVbox.setPadding(new Insets(25,25,25,25));
-        dialogVbox.getChildren().add(nameLabel);
-        dialogVbox.getChildren().add(nameField);
+        dialogVbox.getChildren().add(nameHBox);
+        dialogVbox.getChildren().add(surnameHBox);
         dialogVbox.getChildren().add(listOfPeople);
 
 
