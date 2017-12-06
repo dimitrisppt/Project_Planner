@@ -46,6 +46,10 @@ public class View extends Application{
 		Button people = new Button("Add People");
 
 		Button resource = new Button("Add Resources");
+		resource.setOnAction(event -> {
+			ResourcesPanel rp = new ResourcesPanel();
+			rp.show();
+		});
 
 
 		HBox hTop = new HBox();
@@ -65,7 +69,6 @@ public class View extends Application{
 
 
 		PeoplePanel peoplePanel = new PeoplePanel(people);
-		ResourcesPanel resourcesPanel = new ResourcesPanel(resource);
 
 
 		primaryStage.show();
