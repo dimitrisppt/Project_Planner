@@ -44,6 +44,10 @@ public class View extends Application{
         });
 
 		Button people = new Button("Add People");
+		people.setOnAction(event -> {
+			PeoplePanel pp = new PeoplePanel();
+			pp.show();
+		});
 
 		Button resource = new Button("Add Resources");
 		resource.setOnAction(event -> {
@@ -67,8 +71,6 @@ public class View extends Application{
 		pane.setTop(topPane);
 		pane.setCenter(scenetitle);
 
-
-		PeoplePanel peoplePanel = new PeoplePanel(people);
 
 
 		primaryStage.show();
