@@ -22,9 +22,7 @@ public class TaskPanel extends Stage {
     public TaskPanel() {
 
         Button submit = new Button("Submit");
-
         submit.setId("submitButton");
-
         submit.setStyle("-fx-font-weight: bold");
 
         Label personInstructions = new Label("Select people to assign to task.");
