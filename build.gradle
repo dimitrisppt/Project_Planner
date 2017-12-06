@@ -19,8 +19,61 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.20.1'
-    testCompile "com.athaydes.automaton:Automaton:1.3.2"
+    testCompile "com.athaydes.automaton:Automaton:1.3.2
+    testCompile 'org.mockito:mockito-core:2.7.22'
 }
+
+task createTaskDatabase {
+    delete 'build/resources/main/tasks.db'
+    def databaseFile = file("build/resources/main/tasks.db")
+    outputs.file(databaseFile)
+    doLast {
+        def db = openSQLiteDatabase(databaseFile)
+        db.execute("""CREATE TABLE tasks (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	name varchar(255) NOT NULL,
+        	description text,
+        	effort_estimate integer NOT NULL,
+        	date_time integer
+        );""")
+
+        db.execute("""CREATE TABLE prereq_tasks (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	this_task_id integer NOT NULL,
+        	prereq_task_id integer NOT NULL,
+          FOREIGN KEY(this_task_id) REFERENCES tasks(ID) ON DELETE CASCADE,
+          FOREIGN KEY(prereq_task_id) REFERENCES tasks(ID) ON DELETE CASCADE
+        );""")
+
+        db.execute("""CREATE TABLE people (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	first_name varchar(30) NOT NULL,
+        	last_name varchar(30) NOT NULL
+        );""")
+
+        db.execute("""CREATE TABLE people_to_tasks (
+        	ID integer PRIMARY KEY AUTOINCREMENT,
+        	person_id integer NOT NULL,
+        	task_id integer NOT NULL,
+          FOREIGN KEY(person_id) REFERENCES people(ID) ON DELETE CASCADE,
+          FOREIGN KEY(task_id) REFERENCES tasks(ID) ON DELETE CASCADE
+        );""")
+
+        db.execute("""CREATE TABLE resources (
+            ID integer PRIMARY KEY AUTOINCREMENT,
+            name varchar(255) NOT NULL);""")
+
+        db.execute("""CREATE TABLE resource_to_task (
+            ID integer PRIMARY KEY AUTOINCREMENT,
+            resource_id integer NOT NULL,
+            task_id integer NOT NULL,
+          FOREIGN KEY(resource_id) REFERENCES resources(ID) ON DELETE CASCADE,
+          FOREIGN KEY(task_id) REFERENCES tasks(ID) ON DELETE CASCADE);""")
+    }
+}
+
+tasks.build.dependsOn(createTaskDatabase)
+tasks.testClasses.dependsOn(createTaskDatabase);
 
 task createTestDatabase {
     delete 'build/resources/test/test.db'
