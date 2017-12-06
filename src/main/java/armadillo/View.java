@@ -1,6 +1,8 @@
 package armadillo;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -36,6 +38,10 @@ public class View extends Application{
 		scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
 		Button task = new Button("Enter Task");
+		task.setOnAction(event -> {
+            TaskPanel tp = new TaskPanel();
+            tp.show();
+        });
 
 		Button people = new Button("Add People");
 
@@ -58,7 +64,6 @@ public class View extends Application{
 		pane.setCenter(scenetitle);
 
 
-		TaskPanel taskPanel = new TaskPanel(task);
 		PeoplePanel peoplePanel = new PeoplePanel(people);
 		ResourcesPanel resourcesPanel = new ResourcesPanel(resource);
 
