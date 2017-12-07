@@ -37,8 +37,14 @@ public class PeoplePanel extends Stage{
         submit.setId("submitPeopleButton");
         submit.setStyle("-fx-font-weight: bold");
 
+        Button close = new Button("Close");
+        close.setOnAction(event -> {this.close();});
+        close.setId("closeButton");
+        close.setStyle("-fx-font-weight: bold");
+
         BorderPane buttonPane = new BorderPane();
-        buttonPane.setRight(submit);
+        buttonPane.setLeft(submit);
+        buttonPane.setRight(close);
 
         nameField.setId("nameField");
         surnameField.setId("surnameField");

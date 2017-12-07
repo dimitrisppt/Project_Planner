@@ -8,9 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -36,23 +34,33 @@ public class ResourcesPanel extends Stage {
         submit.setId("submitResourceButton");
         submit.setStyle("-fx-font-weight: bold");
 
+        Button close = new Button("Close");
+        close.setOnAction(event -> {this.close();});
+        close.setId("closeButton");
+        close.setStyle("-fx-font-weight: bold");
+
         BorderPane buttonPane = new BorderPane();
-        buttonPane.setRight(submit);
+        buttonPane.setLeft(submit);
+        buttonPane.setRight(close);
 
         resourceField = new TextField();
         resourceField.setId("resourceField");
         resourceField.setMaxSize(200,25);
 
+        HBox resourceHBox = new HBox();
+        resourceHBox.setSpacing(15);
+        resourceHBox.getChildren().addAll(resourceLabel, resourceField);
+
         resources = FXCollections.observableArrayList ();
         ListView<Resource> listOfResources = new ListView<>(resources);
         listOfResources.setCellFactory(param -> new resourcesCell(resourceController));
+        listOfResources.setId("listResources");
 
 
         this.initModality(Modality.APPLICATION_MODAL);
         VBox dialogVbox = new VBox(20);
         dialogVbox.setPadding(new Insets(25,25,25,25));
-        dialogVbox.getChildren().add(resourceLabel);
-        dialogVbox.getChildren().add(resourceField);
+        dialogVbox.getChildren().add(resourceHBox);
         dialogVbox.getChildren().add(listOfResources);
         dialogVbox.getChildren().add(buttonPane);
 
@@ -77,6 +85,8 @@ public class ResourcesPanel extends Stage {
     static class resourcesCell extends ListCell<Resource> {
 
         private HBox hbox = new HBox();
+        private Pane pane = new Pane();
+
         private Button button = new Button("Delete");
         private Label label = new Label("");
 
@@ -84,8 +94,11 @@ public class ResourcesPanel extends Stage {
 
             super();
             hbox.setSpacing(5);
-            hbox.getChildren().addAll(label, button);
+            hbox.getChildren().addAll(label, pane, button);
+            hbox.setHgrow(pane, Priority.ALWAYS);
             button.setOnAction(event -> {resourceController.delete(this.getItem());});
+
+
         }
 
         @Override

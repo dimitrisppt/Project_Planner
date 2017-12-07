@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -39,6 +40,11 @@ public class TaskPanel extends Stage {
         submit.setOnAction(event -> {taskController.add(getTaskName(), getTaskDescription(), getHours(), getMinutes());});
         submit.setId("submitButton");
         submit.setStyle("-fx-font-weight: bold");
+
+        Button close = new Button("Close");
+        close.setOnAction(event -> {this.close();});
+        close.setId("closeButton");
+        close.setStyle("-fx-font-weight: bold");
 
         Label personInstructions = new Label("Select people to assign to task.");
         Label taskInstructions = new Label("Select prerequisite tasks or delete pre-existing tasks.");
@@ -73,11 +79,16 @@ public class TaskPanel extends Stage {
         spinnerHours = new Spinner<Integer>();
         int initialValueHours = 1;
         SpinnerValueFactory<Integer> valueFactoryHours = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueHours);
+        spinnerHours.setId("spinnerHours");
+        spinnerHours.setEditable(true);
+
+
 
         spinnerMins = new Spinner<Integer>();
         int initialValueMins = 0;
-
         SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueMins);
+        spinnerMins.setId("spinnerMins");
+        spinnerMins.setEditable(true);
 
 
         spinnerHours.setValueFactory(valueFactoryHours);
@@ -99,15 +110,19 @@ public class TaskPanel extends Stage {
         people = FXCollections.observableArrayList ();
         ListView<Person> listOfPeople = new ListView<>(people);
         listOfPeople.setCellFactory(param -> new peopleCell(taskController));
+        listOfPeople.setId("listOfPeople");
 
 
         tasks = FXCollections.observableArrayList ();
         ListView<Task> listOfTasks = new ListView<>(tasks);
         listOfTasks.setCellFactory(param -> new taskCell(taskController));
+        listOfTasks.setId("listOfTasks");
+
 
         resources = FXCollections.observableArrayList ();
         ListView<Resource> listOfResources = new ListView<>(resources);
         listOfResources.setCellFactory(param -> new resourcesCell(taskController));
+        listOfResources.setId("listOfResources");
 
 
 
@@ -117,12 +132,14 @@ public class TaskPanel extends Stage {
         BorderPane borderPane = new BorderPane();
 
         VBox peopleVbox = new VBox();
+        peopleVbox.setId("peopleVbox");
         peopleVbox.getChildren().add(personInstructions);
         //peopleVbox.getChildren().add(blankLabel);
         peopleVbox.setSpacing(25);
         peopleVbox.getChildren().add(listOfPeople);
 
         VBox taskVbox = new VBox();
+        taskVbox.setId("taskVbox");
         taskVbox.getChildren().add(taskInstructions);
         //taskVbox.getChildren().add(blankLabel);
         taskVbox.setSpacing(25);
@@ -130,6 +147,7 @@ public class TaskPanel extends Stage {
         taskVbox.getChildren().add(listOfTasks);
 
         VBox resourcesVbox = new VBox();
+        resourcesVbox.setId("resourcesVbox");
         resourcesVbox.getChildren().add(resourcesInstructions);
 //        resourcesVbox.getChildren().add(resourcesField);
         resourcesVbox.setSpacing(25);
@@ -148,7 +166,9 @@ public class TaskPanel extends Stage {
 
 
         BorderPane buttonPane = new BorderPane();
-        buttonPane.setRight(submit);
+        buttonPane.setPadding(new Insets(25,0,0,0));
+        buttonPane.setLeft(submit);
+        buttonPane.setRight(close);
         borderPane.setBottom(buttonPane);
 
         borderPane.setLeft(peopleVbox);
@@ -160,7 +180,9 @@ public class TaskPanel extends Stage {
         borderPane.setPadding(new Insets(25,25,25,25));
 
         Scene dialogScene = new Scene(borderPane, 850, 500);
+
         this.setScene(dialogScene);
+
 
     }
 
@@ -205,7 +227,6 @@ public class TaskPanel extends Stage {
     static class taskCell extends ListCell<Task> {
 
         HBox hbox = new HBox();
-
 
         CheckBox checkbox = new CheckBox();
         Button button = new Button("Delete");
