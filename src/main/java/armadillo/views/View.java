@@ -2,6 +2,7 @@ package armadillo.views;
 
 import armadillo.controllers.PeopleController;
 import armadillo.controllers.ResourceController;
+import armadillo.controllers.TaskController;
 import armadillo.models.Database;
 import armadillo.views.PeoplePanel;
 import armadillo.views.ResourcesPanel;
@@ -30,6 +31,7 @@ public class View extends Application{
 		Database database = new Database();
 		ResourceController rc = new ResourceController(database);
 		PeopleController pc = new PeopleController(database);
+		TaskController tc=  new TaskController(database);
 
 		
 		// Initialise object of the main scene
@@ -45,19 +47,22 @@ public class View extends Application{
 
 		Button task = new Button("Enter Task");
 		task.setOnAction(event -> {
-            TaskPanel tp = new TaskPanel();
+            TaskPanel tp = tc.getTp();
+            tc.update();
             tp.show();
         });
 
 		Button people = new Button("Add People");
 		people.setOnAction(event -> {
 			PeoplePanel pp = pc.getPp();
+			pc.update();
 			pp.show();
 		});
 
 		Button resource = new Button("Add Resources");
 		resource.setOnAction(event -> {
 			ResourcesPanel rp = rc.getRp();
+			rc.update();
 			rp.show();
 		});
 
