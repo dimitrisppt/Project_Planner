@@ -60,7 +60,6 @@ public class PeoplePanel extends Stage{
 
         Scene dialogScene = new Scene(dialogVbox, 500, 500);
         this.setScene(dialogScene);
-        this.show();
 
 
     }
