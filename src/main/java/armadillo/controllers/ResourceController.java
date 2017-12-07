@@ -3,6 +3,7 @@ package armadillo.controllers;
 import armadillo.models.Database;
 import armadillo.models.Resource;
 import armadillo.views.ExceptionAlert;
+import armadillo.views.InvalidInputAlert;
 import armadillo.views.ResourcesPanel;
 
 import java.sql.SQLException;
@@ -35,6 +36,9 @@ public class ResourceController {
         } catch (SQLException | ClassNotFoundException e) {
             ExceptionAlert ea = new ExceptionAlert(e);
             ea.showAndWait();
+        } catch (IllegalArgumentException e) {
+            InvalidInputAlert iia = new InvalidInputAlert(e);
+            iia.showAndWait();
         }
         System.out.println("Add: " + newResourceText);
         update();
