@@ -31,7 +31,10 @@ public class Database {
      */
     public Connection getConnection() throws SQLException, ClassNotFoundException {
         Class.forName("org.sqlite.JDBC");
-        return DriverManager.getConnection(url);
+        Connection conn = DriverManager.getConnection(url);
+        Statement statement = conn.createStatement();
+        statement.execute("PRAGMA foreign_keys=ON");
+        return conn;
     }
 
     /**

@@ -1,5 +1,8 @@
 package armadillo.views;
 
+import armadillo.controllers.PeopleController;
+import armadillo.models.ElementDoesNotExistException;
+import armadillo.models.Person;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -9,18 +12,28 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class PeoplePanel extends Stage{
+import java.sql.SQLException;
+import java.util.Set;
+import java.util.TreeSet;
 
-    public PeoplePanel(){
+public class PeoplePanel extends Stage{
+    private final PeopleController peopleController;
+    private TextField nameField;
+    private TextField surnameField;
+    private ObservableList<Person> people;
+
+    public PeoplePanel(PeopleController peopleController) {
+        this.peopleController = peopleController;
 
 
         Label nameLabel = new Label("Enter Name: ");
         Label surnameLabel = new Label("Enter Surname: ");
 
-        TextField nameField = new TextField();
-        TextField surnameField = new TextField();
+        nameField = new TextField();
+        surnameField = new TextField();
 
         Button submit = new Button("Submit");
+        submit.setOnAction(event -> {peopleController.add(getFirstNameEntry(), getLastNameEntry());});
         submit.setId("submitPeopleButton");
         submit.setStyle("-fx-font-weight: bold");
 
@@ -33,11 +46,9 @@ public class PeoplePanel extends Stage{
         surnameField.setMaxSize(200,25);
 
 
-
-        ObservableList<String> people = FXCollections.observableArrayList (
-                "Nick", "Eric");
-        ListView<String> listOfPeople = new ListView<String>(people);
-        listOfPeople.setCellFactory(param -> new peopleCell());
+        people = FXCollections.observableArrayList ();
+        ListView<Person> listOfPeople = new ListView<>(people);
+        listOfPeople.setCellFactory(param -> new peopleCell(peopleController));
 
 
 
@@ -60,13 +71,27 @@ public class PeoplePanel extends Stage{
 
         Scene dialogScene = new Scene(dialogVbox, 500, 500);
         this.setScene(dialogScene);
-        this.show();
+    }
 
+    public void clearText() {
+        nameField.clear();
+        surnameField.clear();
+    }
 
+    public String getFirstNameEntry() {
+        return nameField.getText();
+    }
+
+    public String getLastNameEntry() {
+        return surnameField.getText();
+    }
+
+    public void updatePeople(Set<Person> people) {
+        this.people.setAll(people);
     }
 
 
-    static class peopleCell extends ListCell<String> {
+    static class peopleCell extends ListCell<Person> {
 
         HBox hbox = new HBox();
         Pane pane = new Pane();
@@ -74,17 +99,18 @@ public class PeoplePanel extends Stage{
         Button button = new Button("Delete");
         Label label = new Label("");
 
-        public peopleCell(){
+        public peopleCell(PeopleController peopleController){
 
             super();
             hbox.setSpacing(5);
             hbox.getChildren().addAll(label, pane, button);
             hbox.setHgrow(pane, Priority.ALWAYS);
+            button.setOnAction(event -> {peopleController.delete(getItem());});
 
         }
 
         @Override
-        public void updateItem(String item, boolean empty) {
+        public void updateItem(Person item, boolean empty) {
 
             super.updateItem(item, empty);
             if (empty) {
@@ -92,8 +118,12 @@ public class PeoplePanel extends Stage{
                 setText(null);
                 setGraphic(null);
             } else {
-
-                label.setText(item);
+                try {
+                    label.setText(item.getFullName());
+                } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e) {
+                    ExceptionAlert ea = new ExceptionAlert(e);
+                    ea.show();
+                }
                 setGraphic(hbox);
             }
         }

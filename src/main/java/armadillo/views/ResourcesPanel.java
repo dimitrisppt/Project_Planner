@@ -1,9 +1,10 @@
 package armadillo.views;
 
+import armadillo.controllers.ResourceController;
+import armadillo.models.ElementDoesNotExistException;
+import armadillo.models.Resource;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -13,32 +14,38 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class ResourcesPanel extends Stage {
+import java.sql.SQLException;
+import java.util.Set;
 
-    public ResourcesPanel() {
+public class ResourcesPanel extends Stage {
+    private final ResourceController resourceController;
+    private ObservableList<Resource> resources;
+    private TextField resourceField;
+
+    public ResourcesPanel(ResourceController resourceController) {
+        this.resourceController = resourceController;
 
 
         Label resourceLabel = new Label("Enter Resource: ");
 
 
         Button submit = new Button("Submit");
+        submit.setOnAction(event -> {
+            resourceController.add(this.getNewResourceText());
+        });
         submit.setId("submitResourceButton");
         submit.setStyle("-fx-font-weight: bold");
 
         BorderPane buttonPane = new BorderPane();
         buttonPane.setRight(submit);
 
-        TextField resourceField = new TextField();
+        resourceField = new TextField();
         resourceField.setId("resourceField");
         resourceField.setMaxSize(200,25);
 
-
-
-        ObservableList<String> resource = FXCollections.observableArrayList (
-                "Resource #1", "Resource #2");
-        ListView<String> listOfResources = new ListView<String>(resource);
-        listOfResources.setCellFactory(param -> new resourcesCell());
-
+        resources = FXCollections.observableArrayList ();
+        ListView<Resource> listOfResources = new ListView<>(resources);
+        listOfResources.setCellFactory(param -> new resourcesCell(resourceController));
 
 
         this.initModality(Modality.APPLICATION_MODAL);
@@ -55,21 +62,34 @@ public class ResourcesPanel extends Stage {
         this.setScene(dialogScene);
     }
 
-    static class resourcesCell extends ListCell<String> {
+    public void updateResources(Set<Resource> resources) {
+        this.resources.setAll(resources);
+    }
 
-        HBox hbox = new HBox();
-        Button button = new Button("Delete");
-        Label label = new Label("");
+    public String getNewResourceText() {
+        return resourceField.getText();
+    }
 
-        public resourcesCell(){
+    public void clearNewResourceText() {
+        resourceField.clear();
+    }
+
+    static class resourcesCell extends ListCell<Resource> {
+
+        private HBox hbox = new HBox();
+        private Button button = new Button("Delete");
+        private Label label = new Label("");
+
+        public resourcesCell(ResourceController resourceController){
 
             super();
             hbox.setSpacing(5);
             hbox.getChildren().addAll(label, button);
+            button.setOnAction(event -> {resourceController.delete(this.getItem());});
         }
 
         @Override
-        public void updateItem(String item, boolean empty) {
+        public void updateItem(Resource item, boolean empty) {
 
             super.updateItem(item, empty);
 
@@ -78,8 +98,12 @@ public class ResourcesPanel extends Stage {
                 setText(null);
                 setGraphic(null);
             } else {
-
-                label.setText(item);
+                try {
+                    label.setText(item.getName());
+                } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e ) {
+                    ExceptionAlert ea = new ExceptionAlert(e);
+                    ea.show();
+                }
                 setGraphic(hbox);
             }
         }

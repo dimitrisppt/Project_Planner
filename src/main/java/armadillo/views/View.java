@@ -1,5 +1,9 @@
 package armadillo.views;
 
+import armadillo.controllers.PeopleController;
+import armadillo.controllers.ResourceController;
+import armadillo.controllers.TaskController;
+import armadillo.models.Database;
 import armadillo.views.PeoplePanel;
 import armadillo.views.ResourcesPanel;
 import armadillo.views.TaskPanel;
@@ -24,7 +28,11 @@ public class View extends Application{
 
 	@Override
     public void start(Stage primaryStage) throws Exception{
-		
+		Database database = new Database();
+		ResourceController rc = new ResourceController(database);
+		PeopleController pc = new PeopleController(database);
+		TaskController tc=  new TaskController(database);
+
 		
 		// Initialise object of the main scene
 		primaryStage.setTitle("Project Planner");
@@ -39,19 +47,22 @@ public class View extends Application{
 
 		Button task = new Button("Enter Task");
 		task.setOnAction(event -> {
-            TaskPanel tp = new TaskPanel();
+            TaskPanel tp = tc.getTp();
+            tc.update();
             tp.show();
         });
 
 		Button people = new Button("Add People");
 		people.setOnAction(event -> {
-			PeoplePanel pp = new PeoplePanel();
+			PeoplePanel pp = pc.getPp();
+			pc.update();
 			pp.show();
 		});
 
 		Button resource = new Button("Add Resources");
 		resource.setOnAction(event -> {
-			ResourcesPanel rp = new ResourcesPanel();
+			ResourcesPanel rp = rc.getRp();
+			rc.update();
 			rp.show();
 		});
 

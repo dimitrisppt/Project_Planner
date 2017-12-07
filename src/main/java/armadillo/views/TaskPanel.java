@@ -1,9 +1,14 @@
 package armadillo.views;
 
+import armadillo.controllers.TaskController;
+import armadillo.models.ElementDoesNotExistException;
+import armadillo.models.Person;
+import armadillo.models.Resource;
+import armadillo.models.Task;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,35 +16,42 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
+import java.util.Set;
+
 public class TaskPanel extends Stage {
+    private final TaskController taskController;
+    private ObservableList<Resource> resources;
+    private ObservableList<Person> people;
+    private ObservableList<Task> tasks;
+    private Spinner<Integer> spinnerHours;
+    private Spinner<Integer> spinnerMins;
+    private TextField taskField;
+    private TextArea descriptionArea;
 
-
-    public TaskPanel() {
+    public TaskPanel(TaskController taskController) {
+        this.taskController = taskController;
 
         Button submit = new Button("Submit");
+        submit.setOnAction(event -> {taskController.add(getTaskName(), getTaskDescription(), getHours(), getMinutes());});
         submit.setId("submitButton");
         submit.setStyle("-fx-font-weight: bold");
 
         Label personInstructions = new Label("Select people to assign to task.");
         Label taskInstructions = new Label("Select prerequisite tasks or delete pre-existing tasks.");
-        Label resourcesInstructions = new Label("Enter required resources.");
+        Label resourcesInstructions = new Label("Select required resources.");
 
-        Label blankLabel = new Label();
-        TextField resourcesField = new TextField();
 
         Label taskLabel = new Label("Task Name:");
         taskLabel.setStyle("-fx-font-weight: bold");
 
-        resourcesField.setId("resourcesField");
 
         // taskLabel.setAlignment(Pos.TOP_LEFT);
 
-        TextField taskField = new TextField();
+        taskField = new TextField();
         //taskField.setAlignment(Pos.TOP_CENTER);
         taskField.setMaxSize(200,25);
 
@@ -49,7 +61,7 @@ public class TaskPanel extends Stage {
         taskDescription.setStyle("-fx-font-weight: bold");
 
 
-        TextArea descriptionArea = new TextArea();
+        descriptionArea = new TextArea();
         descriptionArea.setWrapText(true);
         descriptionArea.setMaxSize(200,50);
         descriptionArea.setId("taskDescArea");
@@ -58,11 +70,11 @@ public class TaskPanel extends Stage {
         Label spinnerLabelHours = new Label("Hours:");
         Label spinnerLabelMins = new Label("Minutes:");
 
-        Spinner<Integer> spinnerHours = new Spinner<Integer>();
+        spinnerHours = new Spinner<Integer>();
         int initialValueHours = 1;
         SpinnerValueFactory<Integer> valueFactoryHours = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueHours);
 
-        Spinner<Integer> spinnerMins = new Spinner<Integer>();
+        spinnerMins = new Spinner<Integer>();
         int initialValueMins = 0;
 
         SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueMins);
@@ -70,8 +82,8 @@ public class TaskPanel extends Stage {
 
         spinnerHours.setValueFactory(valueFactoryHours);
         spinnerMins.setValueFactory(valueFactoryMins);
-        spinnerHours.setMaxWidth(50);
-        spinnerMins.setMaxWidth(50);
+        spinnerHours.setMaxWidth(70);
+        spinnerMins.setMaxWidth(70);
 
         Label effortLabel = new Label("Effort Estimate:");
         effortLabel.setStyle("-fx-font-weight: bold");
@@ -84,21 +96,18 @@ public class TaskPanel extends Stage {
         spinnerHBox.getChildren().addAll(spinnerLabelMins, spinnerMins);
 
 
-        ObservableList<String> people = FXCollections.observableArrayList (
-                "Person #1", "Person #2");
-        ListView<String> listOfPeople = new ListView<>(people);
-        listOfPeople.setCellFactory(param -> new checkBoxCell());
+        people = FXCollections.observableArrayList ();
+        ListView<Person> listOfPeople = new ListView<>(people);
+        listOfPeople.setCellFactory(param -> new peopleCell(taskController));
 
 
-        ObservableList<String> items = FXCollections.observableArrayList (
-                "Task #1", "Task #2", "Task #3");
-        ListView<String> listOfTasks = new ListView<String>(items);
-        listOfTasks.setCellFactory(param -> new taskCell());
+        tasks = FXCollections.observableArrayList ();
+        ListView<Task> listOfTasks = new ListView<>(tasks);
+        listOfTasks.setCellFactory(param -> new taskCell(taskController));
 
-        ObservableList<String> resources = FXCollections.observableArrayList (
-                "Resource #1", "Resource #2", "Resource #3");
-        ListView<String> listOfResources = new ListView<String>(resources);
-        listOfResources.setCellFactory(param -> new resourcesCell());
+        resources = FXCollections.observableArrayList ();
+        ListView<Resource> listOfResources = new ListView<>(resources);
+        listOfResources.setCellFactory(param -> new resourcesCell(taskController));
 
 
 
@@ -122,7 +131,8 @@ public class TaskPanel extends Stage {
 
         VBox resourcesVbox = new VBox();
         resourcesVbox.getChildren().add(resourcesInstructions);
-        resourcesVbox.getChildren().add(resourcesField);
+//        resourcesVbox.getChildren().add(resourcesField);
+        resourcesVbox.setSpacing(25);
         resourcesVbox.getChildren().add(listOfResources);
 
         dialogHbox.setAlignment(Pos.CENTER);
@@ -154,7 +164,45 @@ public class TaskPanel extends Stage {
 
     }
 
-    static class taskCell extends ListCell<String> {
+    public void updateResources(Set<Resource> allResources) {
+        resources.setAll(allResources);
+    }
+
+    public void updatePeople(Set<Person> allPeople) {
+        people.setAll(allPeople);
+    }
+
+    public void updateTasks(Set<Task> allTasks) {
+        tasks.setAll(allTasks);
+    }
+
+    public String getTaskName() {
+        return taskField.getText();
+    }
+
+    public String getTaskDescription() {
+        return descriptionArea.getText();
+    }
+
+    public int getHours() {
+        return spinnerHours.getValue();
+    }
+
+    public int getMinutes() {
+        return spinnerMins.getValue();
+    }
+
+    public void clear() {
+        taskField.clear();
+        descriptionArea.clear();
+        spinnerHours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, 1));
+        spinnerMins.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300,1));
+        resources.clear();
+        people.clear();
+        tasks.clear();
+    }
+
+    static class taskCell extends ListCell<Task> {
 
         HBox hbox = new HBox();
 
@@ -162,66 +210,114 @@ public class TaskPanel extends Stage {
         CheckBox checkbox = new CheckBox();
         Button button = new Button("Delete");
         Label label = new Label("");
+        private TaskController taskController;
 
-        public taskCell(){
+        public taskCell(TaskController taskController){
             super();
             hbox.setSpacing(5);
             hbox.getChildren().addAll(checkbox, label, button);
+            this.taskController = taskController;
+            button.setOnAction(event -> {
+                taskController.delete(getItem());
+            });
         }
 
         @Override
-        public void updateItem(String item, boolean empty) {
+        public void updateItem(Task item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {
                 setText(null);
                 setGraphic(null);
             } else {
-                label.setText(item);
+                try {
+                    label.setText(item.getName());
+                } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e) {
+                    ExceptionAlert ea = new ExceptionAlert(e);
+                    ea.show();
+                }
+
+                checkbox = new CheckBox();
+                checkbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        taskController.addSelectedPrerequisiteTask(getItem());
+                    } else {
+                        taskController.removeSelectedPrerequisiteTask(getItem());
+                    }
+                });
                 setGraphic(hbox);
             }
         }
     }
 
-    static class checkBoxCell extends ListCell<String> {
+    static class peopleCell extends ListCell<Person> {
 
-        public void updateItem(String item, boolean empty) {
+        private final TaskController taskController;
+        private CheckBox checkbox;
+
+        public peopleCell(TaskController taskController) {
+            this.taskController = taskController;
+        }
+
+        public void updateItem(Person item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {
                 setText(null);
                 setGraphic(null);
             } else {
-                setText(item);
+                try {
+                    setText(item.getFullName());
+                } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e) {
+                    ExceptionAlert ea = new ExceptionAlert(e);
+                    ea.show();
+                }
 
-                CheckBox checkbox = new CheckBox();
+                checkbox = new CheckBox();
+                checkbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        taskController.addSelectedPerson(getItem());
+                    } else {
+                        taskController.removeSelectedPerson(getItem());
+                    }
+                });
                 setGraphic(checkbox);
             }
         }
     }
 
 
-    static class resourcesCell extends ListCell<String> {
-        HBox hbox = new HBox();
-        Button button = new Button("Delete");
-        Label label = new Label("");
+    static class resourcesCell extends ListCell<Resource> {
 
-        public resourcesCell(){
-            super();
-            hbox.setSpacing(5);
-            hbox.getChildren().addAll(label, button);
+        private final TaskController taskController;
+        private CheckBox checkbox;
+
+        public resourcesCell(TaskController taskController) {
+            this.taskController = taskController;
         }
 
-        @Override
-        public void updateItem(String item, boolean empty) {
+        public void updateItem(Resource item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {
                 setText(null);
                 setGraphic(null);
             } else {
-                label.setText(item);
-                setGraphic(hbox);
+                try {
+                    setText(item.getName());
+                } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e) {
+                    ExceptionAlert ea = new ExceptionAlert(e);
+                    ea.show();
+                }
+
+                checkbox = new CheckBox();
+                checkbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        taskController.addSelectedResource(getItem());
+                    } else {
+                        taskController.removeSelectedResource(getItem());
+                    }
+                });
+                setGraphic(checkbox);
             }
         }
-
     }
 
 
