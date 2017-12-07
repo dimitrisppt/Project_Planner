@@ -68,22 +68,20 @@ def createDatabase(databaseFile) {
 }
 
 task createTaskDatabase {
-    delete 'src/resources/main/tasks.db'
-    def databaseFile = file("src/resources/main/tasks.db")
-    outputs.file(databaseFile)
-    doLast {
+    def databaseFile = file("build/resources/main/tasks.db")
+    if (!databaseFile.exists()) {
         createDatabase(databaseFile)
     }
+
 }
+
 
 tasks.build.dependsOn(createTaskDatabase)
 
 task createTestDatabase {
-    delete 'src/resources/test/tasks.db'
-    def databaseFile = file("src/resources/test/tasks.db")
+    delete 'build/resources/test/tasks.db'
+    def databaseFile = file("build/resources/test/tasks.db")
     outputs.file(databaseFile)
-    doLast {
         createDatabase(databaseFile)
-    }
 }
 tasks.testClasses.dependsOn(createTestDatabase)
