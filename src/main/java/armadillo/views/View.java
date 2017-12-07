@@ -1,5 +1,6 @@
 package armadillo.views;
 
+import armadillo.controllers.PeopleController;
 import armadillo.controllers.ResourceController;
 import armadillo.models.Database;
 import armadillo.views.PeoplePanel;
@@ -26,7 +27,9 @@ public class View extends Application{
 
 	@Override
     public void start(Stage primaryStage) throws Exception{
-		ResourceController rc = new ResourceController(new Database());
+		Database database = new Database();
+		ResourceController rc = new ResourceController(database);
+		PeopleController pc = new PeopleController(database);
 
 		
 		// Initialise object of the main scene
@@ -48,7 +51,7 @@ public class View extends Application{
 
 		Button people = new Button("Add People");
 		people.setOnAction(event -> {
-			PeoplePanel pp = new PeoplePanel();
+			PeoplePanel pp = pc.getPp();
 			pp.show();
 		});
 
