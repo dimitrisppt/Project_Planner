@@ -1,5 +1,6 @@
 package armadillo.views;
 
+import armadillo.controllers.CreateDatabase;
 import armadillo.controllers.PeopleController;
 import armadillo.controllers.ResourceController;
 import armadillo.controllers.TaskController;
@@ -21,13 +22,15 @@ import javafx.stage.Stage;
 
 public class View extends Application{
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		CreateDatabase.createDatabase(Database.MAIN_URL);
         launch(args);
     }
 
 
 	@Override
     public void start(Stage primaryStage) throws Exception{
+
 		Database database = new Database();
 		ResourceController rc = new ResourceController(database);
 		PeopleController pc = new PeopleController(database);
