@@ -1,7 +1,11 @@
 package armadillo.models;
 
+import armadillo.controllers.CreateDatabase;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.TreeSet;
 
@@ -10,6 +14,17 @@ import static org.junit.Assert.*;
 public class PersonIT {
 
     private Database database = new Database("jdbc:sqlite:build/resources/test/tasks.db");
+
+    @Before
+    public void createDatabase() throws SQLException, ClassNotFoundException {
+        CreateDatabase.createDatabase("jdbc:sqlite:build/resources/test/tasks.db");
+    }
+
+    @After
+    public void deleteDatabase() throws SQLException, ClassNotFoundException {
+        File file = new File("build/resources/test/tasks.db");
+        file.delete();
+    }
 
     @Test
     public void testPersonConstructorWithValidNamesThenGettersAndDeleteAndExists() throws SQLException, ClassNotFoundException, ElementDoesNotExistException{
