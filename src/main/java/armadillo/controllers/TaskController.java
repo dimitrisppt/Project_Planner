@@ -53,9 +53,9 @@ public class TaskController {
 //        rp.clearNewResourceText();
 //    }
 
-    public void add(String name, String desc, int hh, int mm) {
+    public void add(String name, String desc, int hh, int mm, long dateTime) {
         try {
-            Task t = new Task(name, desc, hh * 60 * 60 + mm * 60, database);
+            Task t = new Task(name, desc, hh * 60 * 60 + mm * 60, dateTime, database);
             for (Person p : selectedPeople) {
                 t.addPerson(p);
             }

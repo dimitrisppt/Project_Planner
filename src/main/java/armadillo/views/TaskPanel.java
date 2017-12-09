@@ -20,6 +20,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Set;
 
 public class TaskPanel extends Stage {
@@ -37,7 +38,10 @@ public class TaskPanel extends Stage {
         this.taskController = taskController;
 
         Button submit = new Button("Submit");
-        submit.setOnAction(event -> {taskController.add(getTaskName(), getTaskDescription(), getHours(), getMinutes());});
+        submit.setOnAction(event -> {
+        	taskController.add(getTaskName(), getTaskDescription(), getHours(), getMinutes(), getDateTime());
+        	System.out.println("Selected date: " + getDateTime());
+        });
         submit.setId("submitButton");
         submit.setStyle("-fx-font-weight: bold");
 
@@ -82,7 +86,7 @@ public class TaskPanel extends Stage {
         SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueMins);
 
         dateSelection = new DatePicker();
-
+        
         spinnerHours.setValueFactory(valueFactoryHours);
         spinnerMins.setValueFactory(valueFactoryMins);
         spinnerHours.setMaxWidth(70);
@@ -194,6 +198,11 @@ public class TaskPanel extends Stage {
 
     public int getMinutes() {
         return spinnerMins.getValue();
+    }
+    
+    public long getDateTime() {
+    	LocalDate dateTime = dateSelection.getValue();
+    	return (dateTime.getYear()*10000 + dateTime.getMonthValue()*100 + dateTime.getDayOfMonth());
     }
 
     public void clear() {

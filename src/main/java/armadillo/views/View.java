@@ -134,17 +134,21 @@ public class View extends Application{
 
         public scheduleCell(TaskController taskController, View view){
             super();
-            borderPane.setTop(taskNameLabel);
-            borderPane.setCenter(taskDescriptionLabel);
+            
+            VBox vbox = new VBox();
+            vbox.setAlignment(Pos.CENTER);
+            vbox.getChildren().addAll(dateTimeLabel, taskDescriptionLabel);
+           
             Button button = new Button("Delete");
             this.taskController = taskController;
             button.setOnAction(event -> {
                 taskController.delete(getItem());
                 taskController.updateSchedule(view);
             });
-            HBox hBox = new HBox();
-            hBox.getChildren().addAll(button, dateTimeLabel);
-            borderPane.setBottom(hBox);
+            
+            borderPane.setTop(taskNameLabel);
+            borderPane.setCenter(vbox);
+            borderPane.setBottom(button);
         }
 
         @Override
@@ -163,9 +167,10 @@ public class View extends Application{
                     	taskDescriptionLabel.setText(item.getDescription());
                     }
                     if(item.getDateTime() == null) {
-                    	dateTimeLabel.setText("--/--/--");
+                    	dateTimeLabel.setText("--/--/---- --:--");
                     }else {
-                    	dateTimeLabel.setText(item.getDateTime().toString());                    	
+                    	String text = item.getDateTime().toString();
+                    	dateTimeLabel.setText(text.substring(0, 4) + "/" + text.substring(4,6) + "/" + text.substring(6,8));                    	
                     }
                     
                 } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e) {
