@@ -31,6 +31,7 @@ public class TaskPanel extends Stage {
     private Spinner<Integer> spinnerMins;
     private TextField taskField;
     private TextArea descriptionArea;
+    private DatePicker dateSelection;
 
     public TaskPanel(TaskController taskController) {
         this.taskController = taskController;
@@ -69,6 +70,7 @@ public class TaskPanel extends Stage {
 
         Label spinnerLabelHours = new Label("Hours:");
         Label spinnerLabelMins = new Label("Minutes:");
+        Label dateLabel	= new Label("Select start date:");
 
         spinnerHours = new Spinner<Integer>();
         int initialValueHours = 1;
@@ -79,6 +81,7 @@ public class TaskPanel extends Stage {
 
         SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueMins);
 
+        dateSelection = new DatePicker();
 
         spinnerHours.setValueFactory(valueFactoryHours);
         spinnerMins.setValueFactory(valueFactoryMins);
@@ -94,6 +97,7 @@ public class TaskPanel extends Stage {
         spinnerHBox.getChildren().add(effortLabel);
         spinnerHBox.getChildren().addAll(spinnerLabelHours, spinnerHours);
         spinnerHBox.getChildren().addAll(spinnerLabelMins, spinnerMins);
+        spinnerHBox.getChildren().addAll(dateLabel, dateSelection);
 
 
         people = FXCollections.observableArrayList ();
