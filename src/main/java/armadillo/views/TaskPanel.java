@@ -33,6 +33,8 @@ public class TaskPanel extends Stage {
     private TextField taskField;
     private TextArea descriptionArea;
     private DatePicker dateSelection;
+    private Spinner<Integer> spinnerTimeHours;
+    private Spinner<Integer> spinnerTimeMins;
 
     public TaskPanel(TaskController taskController) {
         this.taskController = taskController;
@@ -74,7 +76,8 @@ public class TaskPanel extends Stage {
 
         Label spinnerLabelHours = new Label("Hours:");
         Label spinnerLabelMins = new Label("Minutes:");
-        Label dateLabel	= new Label("Select start date:");
+        
+        
 
         spinnerHours = new Spinner<Integer>();
         int initialValueHours = 1;
@@ -84,14 +87,31 @@ public class TaskPanel extends Stage {
         int initialValueMins = 0;
 
         SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueMins);
-
-        dateSelection = new DatePicker();
-        
+         
         spinnerHours.setValueFactory(valueFactoryHours);
         spinnerMins.setValueFactory(valueFactoryMins);
         spinnerHours.setMaxWidth(70);
         spinnerMins.setMaxWidth(70);
+        
+        Label dateLabel	= new Label("Select start date:  ");
+        dateSelection = new DatePicker(LocalDate.now());
+        dateSelection.setEditable(false);
+        
+        spinnerTimeHours = new Spinner<Integer>();
+        SpinnerValueFactory<Integer> valueFactorySelectHours = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 0);
+        spinnerTimeHours.setValueFactory(valueFactorySelectHours);
+        
+        spinnerTimeMins = new Spinner<Integer>();
+        SpinnerValueFactory<Integer> valueFactorySelectMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0);
+        spinnerTimeMins.setValueFactory(valueFactorySelectMins);
 
+        spinnerTimeHours.setMaxWidth(70);
+        spinnerTimeMins.setMaxWidth(70);
+        
+        Label select = new Label("Select start time (24hr clock):  ");
+        Label select2 = new Label(" : ");
+        select2.setStyle("-fx-font-weight: bold");
+        
         Label effortLabel = new Label("Effort Estimate:");
         effortLabel.setStyle("-fx-font-weight: bold");
         HBox spinnerHBox = new HBox(10);
@@ -101,7 +121,23 @@ public class TaskPanel extends Stage {
         spinnerHBox.getChildren().add(effortLabel);
         spinnerHBox.getChildren().addAll(spinnerLabelHours, spinnerHours);
         spinnerHBox.getChildren().addAll(spinnerLabelMins, spinnerMins);
-        spinnerHBox.getChildren().addAll(dateLabel, dateSelection);
+        
+        
+        VBox dateTimeVBox = new VBox();
+        dateTimeVBox.setAlignment(Pos.CENTER);
+        dateTimeVBox.setPadding(new Insets(0, 0, 25, 0));
+        dateTimeVBox.setSpacing(5);
+        HBox dateHBox = new	HBox();
+        dateHBox.setAlignment(Pos.CENTER);
+        HBox timeHBox = new HBox();
+        timeHBox.setAlignment(Pos.CENTER);
+        
+        dateHBox.getChildren().addAll(dateLabel, dateSelection);
+        timeHBox.getChildren().addAll(select,spinnerTimeHours, select2, spinnerTimeMins);
+        dateTimeVBox.getChildren().addAll(dateHBox, timeHBox);
+        
+        
+        spinnerHBox.getChildren().addAll(dateTimeVBox);
 
 
         people = FXCollections.observableArrayList ();
@@ -202,7 +238,7 @@ public class TaskPanel extends Stage {
     
     public long getDateTime() {
     	LocalDate dateTime = dateSelection.getValue();
-    	return (dateTime.getYear()*10000 + dateTime.getMonthValue()*100 + dateTime.getDayOfMonth());
+    	return ((long)dateTime.getYear()*100000000 + (long)dateTime.getMonthValue()*1000000 + (long)dateTime.getDayOfMonth()*10000 + (long)spinnerTimeHours.getValue() * 100 + (long)spinnerTimeMins.getValue());
     }
 
     public void clear() {
