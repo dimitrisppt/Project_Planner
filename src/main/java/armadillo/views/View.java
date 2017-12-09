@@ -1,14 +1,22 @@
 package armadillo.views;
 
+import java.sql.SQLException;
+import java.util.Set;
+
 import armadillo.controllers.CreateDatabase;
 import armadillo.controllers.PeopleController;
 import armadillo.controllers.ResourceController;
 import armadillo.controllers.TaskController;
 import armadillo.models.Database;
+import armadillo.models.ElementDoesNotExistException;
+import armadillo.models.Task;
 import armadillo.views.PeoplePanel;
 import armadillo.views.ResourcesPanel;
 import armadillo.views.TaskPanel;
+import armadillo.views.TaskPanel.taskCell;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,6 +29,8 @@ import javafx.stage.Stage;
 
 
 public class View extends Application{
+	
+	private ObservableList<Task> tasks;
 	
 	public static void main(String[] args) throws Exception {
 		CreateDatabase.createDatabase(Database.MAIN_URL);
@@ -77,21 +87,95 @@ public class View extends Application{
 
 		BorderPane topPane = new BorderPane();
 		Button refreshButton = new Button("Refresh");
+		refreshButton.setOnAction(event -> {
+			tc.updateSchedule(this);
+		});
 		refreshButton.setAlignment(Pos.BOTTOM_LEFT);
 		topPane.setCenter(hTop);
 		topPane.setBottom(refreshButton);
 
-
+		
+		ScrollPane schedulePane = new ScrollPane();
+		
+		tasks = FXCollections.observableArrayList ();
+	    ListView<Task> tasksForSchedule = new ListView<>(tasks);
+	    tasksForSchedule.setCellFactory(param -> new scheduleCell(tc, this));
+		
+	    schedulePane.setContent(tasksForSchedule);
+	    schedulePane.setFitToWidth(true);
+		
+		VBox vCenter = new VBox();
+		vCenter.setSpacing(15);
+		vCenter.setAlignment(Pos.CENTER);
+		vCenter.getChildren().addAll(scenetitle, schedulePane);
+		
 		pane.setTop(topPane);
-		pane.setCenter(scenetitle);
+		pane.setCenter(vCenter);
 
-
+		tc.updateSchedule(this);
 
 		primaryStage.show();
 		
     }
+	
+	public void updateTasks(Set<Task> allTasks) {
+        tasks.setAll(allTasks);
+        System.out.println("Test");
+    }
+	
+	
+	static class scheduleCell extends ListCell<Task> {
 
+        BorderPane borderPane = new BorderPane();
+        Label taskNameLabel = new Label("");
+        Label taskDescriptionLabel = new Label("");
+        Label dateTimeLabel = new Label("");
+        private TaskController taskController;
 
+        public scheduleCell(TaskController taskController, View view){
+            super();
+            borderPane.setTop(taskNameLabel);
+            borderPane.setCenter(taskDescriptionLabel);
+            Button button = new Button("Delete");
+            this.taskController = taskController;
+            button.setOnAction(event -> {
+                taskController.delete(getItem());
+                taskController.updateSchedule(view);
+            });
+            HBox hBox = new HBox();
+            hBox.getChildren().addAll(button, dateTimeLabel);
+            borderPane.setBottom(hBox);
+        }
+
+        @Override
+        public void updateItem(Task item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                try {
+                    taskNameLabel.setText(item.getName());
+                    taskNameLabel.setStyle("-fx-font-weight: bold");
+                    if(item.getDescription().equals("")) {
+                    	taskDescriptionLabel.setText("[No description given]");
+                    }else {
+                    	taskDescriptionLabel.setText(item.getDescription());
+                    }
+                    if(item.getDateTime() == null) {
+                    	dateTimeLabel.setText("--/--/--");
+                    }else {
+                    	dateTimeLabel.setText(item.getDateTime().toString());                    	
+                    }
+                    
+                } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e) {
+                    ExceptionAlert ea = new ExceptionAlert(e);
+                    ea.show();	
+                }
+                setGraphic(borderPane);
+            }
+        }
+    }
 
     
 }
