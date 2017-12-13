@@ -103,9 +103,9 @@ public class TaskIT {
     @Test
     public void testGetAllTasks() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         TreeSet<Task> tasks = Task.getAllTasks(database);
-        tasks.add(new Task("A", "B", 1, database));
-        tasks.add(new Task("C", "D", 3, database));
-        tasks.add(new Task("E", "F", 5, database));
+        tasks.add(new Task("A", "B", 1, 100L, database));
+        tasks.add(new Task("C", "D", 3, 120L, database));
+        tasks.add(new Task("E", "F", 5, 140L, database));
         assertEquals(tasks, Task.getAllTasks(database));
         for (Task t : tasks) {
             t.delete();

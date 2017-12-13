@@ -28,6 +28,11 @@ public class TaskTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWhenNameIsEmpty() throws SQLException, ClassNotFoundException {
+        new Task("", "Test", 100, database);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void testConstructorWhenNameIsTooLong() throws SQLException, ClassNotFoundException {
         StringBuilder sb = new StringBuilder();
         for (int i =  0; i <= 255; i++) {
@@ -51,6 +56,11 @@ public class TaskTest {
     @Test(expected = IllegalArgumentException.class)
     public void testDateTimeConstructorWhenNameIsNull() throws SQLException, ClassNotFoundException {
         new Task(null, "Test", 100, 1002L, database);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDateTimeConstructorWhenNameIsEmpty() throws SQLException, ClassNotFoundException {
+        new Task("", "Test", 100, 100L, database);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -557,12 +567,31 @@ public class TaskTest {
     }
 
     @Test
-    public void testCompareTo() throws SQLException, ClassNotFoundException {
-        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"A\", \"B\", 1)")).thenReturn(1);
-        when(database.executeInsertStatement("INSERT INTO tasks (name, description, effort_estimate) VALUES (\"C\", \"D\", 5)")).thenReturn(2);
-        Task t1 = new Task("A", "B", 1, database);
-        Task t2 = new Task("C", "D", 5, database);
+    public void testCompareToWhenBefore() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        when(database.executeInsertStatement(Mockito.any())).thenReturn(1).thenReturn(2);
+        Task t1 = Mockito.spy(new Task("A", "B", 1, 100L, database));
+        doReturn(100L).when(t1).getDateTime();
+        Task t2 = Mockito.spy(new Task("C", "D", 5, 120L, database));
+        doReturn(120L).when(t2).getDateTime();
         assertEquals(-1, t1.compareTo(t2));
+    }
+
+    @Test
+    public void testCompareToWhenEqual() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        when(database.executeInsertStatement(Mockito.any())).thenReturn(1).thenReturn(2);
+        Task t1 = Mockito.spy(new Task("A", "B", 1, 100L, database));
+        doReturn(100L).when(t1).getDateTime();
+        assertEquals(0, t1.compareTo(t1));
+    }
+
+    @Test
+    public void testCompareToWhenAfter() throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
+        when(database.executeInsertStatement(Mockito.any())).thenReturn(1).thenReturn(2);
+        Task t1 = Mockito.spy(new Task("A", "B", 1, 100L, database));
+        doReturn(100L).when(t1).getDateTime();
+        Task t2 = Mockito.spy(new Task("C", "D", 5, 120L, database));
+        doReturn(120L).when(t2).getDateTime();
+        assertEquals(1, t2.compareTo(t1));
     }
 }
 
