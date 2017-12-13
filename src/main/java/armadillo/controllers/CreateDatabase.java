@@ -5,7 +5,16 @@ import armadillo.models.Database;
 import java.io.File;
 import java.sql.SQLException;
 
+/**
+ * This is a class used for creating the database for the project
+ */
 public class CreateDatabase {
+    /**
+     * Creates a new Database
+     * @param url the JDBC url
+     * @throws SQLException If there is an error with SQLite
+     * @throws ClassNotFoundException If SQLite cannot be found
+     */
     public static void createDatabase(String url) throws SQLException, ClassNotFoundException {
         String[] split_url = url.split(":");
         if (split_url.length != 3) throw new IllegalArgumentException("URL not valid");
