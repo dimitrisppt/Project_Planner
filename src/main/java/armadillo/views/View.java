@@ -13,6 +13,8 @@ import armadillo.controllers.TaskController;
 import armadillo.models.Database;
 import armadillo.models.ElementDoesNotExistException;
 import armadillo.models.Task;
+import armadillo.models.Person;
+import armadillo.models.Resource;
 import armadillo.views.PeoplePanel;
 import armadillo.views.ResourcesPanel;
 import armadillo.views.TaskPanel;
@@ -24,6 +26,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -98,19 +101,16 @@ public class View extends Application{
 		topPane.setBottom(refreshButton);
 
 		
-		ScrollPane schedulePane = new ScrollPane();
+		
 		
 		tasks = FXCollections.observableArrayList ();
 	    ListView<Task> tasksForSchedule = new ListView<>(tasks);
 	    tasksForSchedule.setCellFactory(param -> new scheduleCell(tc, this));
 		
-	    schedulePane.setContent(tasksForSchedule);
-	    schedulePane.setFitToWidth(true);
-		
 		VBox vCenter = new VBox();
 		vCenter.setSpacing(15);
 		vCenter.setAlignment(Pos.CENTER);
-		vCenter.getChildren().addAll(scenetitle, schedulePane);
+		vCenter.getChildren().addAll(scenetitle, tasksForSchedule);
 		
 		pane.setTop(topPane);
 		pane.setCenter(vCenter);
@@ -133,6 +133,7 @@ public class View extends Application{
         Label taskNameLabel = new Label("");
         Label taskDescriptionLabel = new Label("");
         Label dateTimeLabel = new Label("");
+        Button seeMore = new Button("More details");
         private TaskController taskController;
 
         public scheduleCell(TaskController taskController, View view){
@@ -149,9 +150,14 @@ public class View extends Application{
                 taskController.updateSchedule(view);
             });
             
+            
+            HBox buttonsHBox = new HBox();
+            
+            buttonsHBox.getChildren().addAll(button, seeMore);
+            
             borderPane.setTop(taskNameLabel);
             borderPane.setCenter(vbox);
-            borderPane.setBottom(button);
+            borderPane.setBottom(buttonsHBox);
         }
 
         @Override
@@ -176,6 +182,32 @@ public class View extends Application{
                     	Date date = new Date(item.getDateTime()*1000);
                         dateTimeLabel.setText(format.format(date));
                     }
+                   
+                    String people = "";
+                    for(Person e:item.getPeople()) {
+                    	people += "\n" + e.getFullName();
+                    }
+                    
+                    String resources = "";
+                    for(Resource e:item.getResources()) {
+                    	resources += "\n" + e.getName();
+                    }
+                    
+                    String tasks = "";
+                    for(Task e:item.getPrerequisiteTasks()) {
+                    	tasks += "\n" + e.getName();  	
+                    }
+                    
+                    
+                    String detailsString = "Task Name: " + item.getName() + "\nTask description: " + item.getDescription() + "\nEffort Estimate: " + item.getEffortEstimate()/3600 + "Hrs, " + (item.getEffortEstimate() % 3600) / 60 + "Mins\nPeople assigned to task: " + people + "\nResources required: " + resources + "\nPrerequisite tasks: " + tasks; 
+                    String name = item.getName();
+                    seeMore.setOnAction(event -> {
+                    	Alert alert = new Alert(AlertType.INFORMATION);
+                    	alert.setTitle(name);
+                    	alert.setHeaderText(null);
+                    	alert.setContentText(detailsString);
+                    	alert.showAndWait();
+                    });
                     
                 } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e) {
                     ExceptionAlert ea = new ExceptionAlert(e);
