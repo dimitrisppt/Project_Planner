@@ -11,16 +11,33 @@ import armadillo.views.ResourcesPanel;
 import java.sql.SQLException;
 import java.util.TreeSet;
 
+/**
+ * The controller for the people view
+ */
 public class PeopleController {
+    /**
+     * The database connection
+     */
     private Database database;
+    /**
+     * The PeoplePanel
+     */
     private PeoplePanel pp;
 
+    /**
+     * Creates a new controller
+     * @param database The database
+     */
     public PeopleController(Database database) {
         this.database = database;
         pp = new PeoplePanel(this);
         update();
     }
 
+    /**
+     * Deletes a person from the databse
+     * @param p the person to delete
+     */
     public void delete(Person p) {
         try {
             p.delete();
@@ -32,6 +49,11 @@ public class PeopleController {
         update();
     }
 
+    /**
+     * Creates a new Person
+     * @param firstName The first name of the person
+     * @param lastName The last name of the person
+     */
     public void add(String firstName, String lastName) {
         try {
             new Person(firstName, lastName, database);
@@ -48,6 +70,9 @@ public class PeopleController {
 
     }
 
+    /**
+     * Updates the PeoplePanel
+     */
     public void update() {
         try {
             TreeSet<Person> people = Person.getAllPeople(database);
@@ -59,6 +84,10 @@ public class PeopleController {
         System.out.println("update");
     }
 
+    /**
+     * Gets the PeoplePanel
+     * @return the PeoplePanel
+     */
     public PeoplePanel getPp() {
         return pp;
     }

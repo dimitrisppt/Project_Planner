@@ -77,8 +77,8 @@ public class TaskPanel extends Stage {
 
         Label spinnerLabelHours = new Label("Hours:");
         Label spinnerLabelMins = new Label("Minutes:");
-        
-        
+
+
 
         spinnerHours = new Spinner<Integer>();
         int initialValueHours = 1;
@@ -88,31 +88,31 @@ public class TaskPanel extends Stage {
         int initialValueMins = 0;
 
         SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueMins);
-         
+
         spinnerHours.setValueFactory(valueFactoryHours);
         spinnerMins.setValueFactory(valueFactoryMins);
         spinnerHours.setMaxWidth(70);
         spinnerMins.setMaxWidth(70);
-        
+
         Label dateLabel	= new Label("Select start date:  ");
         dateSelection = new DatePicker(LocalDate.now());
         dateSelection.setEditable(false);
-        
+
         spinnerTimeHours = new Spinner<Integer>();
         SpinnerValueFactory<Integer> valueFactorySelectHours = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 0);
         spinnerTimeHours.setValueFactory(valueFactorySelectHours);
-        
+
         spinnerTimeMins = new Spinner<Integer>();
         SpinnerValueFactory<Integer> valueFactorySelectMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0);
         spinnerTimeMins.setValueFactory(valueFactorySelectMins);
 
         spinnerTimeHours.setMaxWidth(70);
         spinnerTimeMins.setMaxWidth(70);
-        
+
         Label select = new Label("Select start time (24hr clock):  ");
         Label select2 = new Label(" : ");
         select2.setStyle("-fx-font-weight: bold");
-        
+
         Label effortLabel = new Label("Effort Estimate:");
         effortLabel.setStyle("-fx-font-weight: bold");
         HBox spinnerHBox = new HBox(10);
@@ -122,8 +122,8 @@ public class TaskPanel extends Stage {
         spinnerHBox.getChildren().add(effortLabel);
         spinnerHBox.getChildren().addAll(spinnerLabelHours, spinnerHours);
         spinnerHBox.getChildren().addAll(spinnerLabelMins, spinnerMins);
-        
-        
+
+
         VBox dateTimeVBox = new VBox();
         dateTimeVBox.setAlignment(Pos.CENTER);
         dateTimeVBox.setPadding(new Insets(0, 0, 25, 0));
@@ -132,12 +132,12 @@ public class TaskPanel extends Stage {
         dateHBox.setAlignment(Pos.CENTER);
         HBox timeHBox = new HBox();
         timeHBox.setAlignment(Pos.CENTER);
-        
+
         dateHBox.getChildren().addAll(dateLabel, dateSelection);
         timeHBox.getChildren().addAll(select,spinnerTimeHours, select2, spinnerTimeMins);
         dateTimeVBox.getChildren().addAll(dateHBox, timeHBox);
-        
-        
+
+
         spinnerHBox.getChildren().addAll(dateTimeVBox);
 
 
@@ -236,12 +236,12 @@ public class TaskPanel extends Stage {
     public int getMinutes() {
         return spinnerMins.getValue();
     }
-    
+
     public long getDateTime() {
     	LocalDate dateTime = dateSelection.getValue();
     	//return ((long)dateTime.getYear()*100000000 + (long)dateTime.getMonthValue()*1000000 + (long)dateTime.getDayOfMonth()*10000 + (long)spinnerTimeHours.getValue() * 100 + (long)spinnerTimeMins.getValue());
     	return dateTime.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() + spinnerTimeHours.getValue()*60*60 + spinnerTimeMins.getValue()*60;
-    
+
     }
 
     public void clear() {
@@ -256,19 +256,17 @@ public class TaskPanel extends Stage {
 
     static class taskCell extends ListCell<Task> {
 
-        HBox hbox = new HBox();
 
-
-        CheckBox checkbox = new CheckBox();
-        Button button = new Button("Delete");
-        Label label = new Label("");
         private TaskController taskController;
+        private CheckBox checkbox;
+        private Button button;
+        private Label label;
 
         public taskCell(TaskController taskController){
-            super();
-            hbox.setSpacing(5);
-            hbox.getChildren().addAll(checkbox, label, button);
+            // super();
             this.taskController = taskController;
+            button = new Button("Delete");
+            label = new Label("");
             button.setOnAction(event -> {
                 taskController.delete(getItem());
             });
@@ -296,6 +294,11 @@ public class TaskPanel extends Stage {
                         taskController.removeSelectedPrerequisiteTask(getItem());
                     }
                 });
+
+                HBox hbox = new HBox();
+                hbox.setSpacing(5);
+                hbox.getChildren().addAll(checkbox, label, button);
+                //label = new Label("");
                 setGraphic(hbox);
             }
         }

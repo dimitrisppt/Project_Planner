@@ -191,6 +191,16 @@ public class Task implements Comparable<Task>{
 
     @Override
     public int compareTo(Task o) {
-        return this.id - o.id;
+        long thisStart = 0;
+        long oStart = 0;
+        try {
+            thisStart = this.getDateTime();
+            oStart = o.getDateTime();
+        } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException | NullPointerException e) {
+
+        }
+        if (thisStart < oStart) return -1;
+        else if (thisStart == oStart && this.equals(o)) return 0;
+        else return 1;
     }
 }
