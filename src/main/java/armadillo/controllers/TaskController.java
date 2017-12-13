@@ -91,7 +91,10 @@ public class TaskController {
             for (Task t : p.getTasks()) {
                 LocalDateTime t_start = LocalDateTime.ofEpochSecond(t.getDateTime(), 0, ZoneOffset.UTC);
                 LocalDateTime t_end = LocalDateTime.ofEpochSecond(t.getDateTime() + t.getEffortEstimate(), 0, ZoneOffset.UTC);
-                if (!start.isAfter(t_end) || !end.isBefore(t_start)) return new Pair<Boolean, String>(false, "People can only work on one task at a time");
+                if ((t_end.isAfter(start) && t_end.isBefore(end))
+                        || (t_start.isAfter(start) && t_start.isBefore(end))
+                        || (start.isAfter(t_start) && start.isBefore(t_end))
+                        || (end.isAfter(t_start) && end.isBefore(t_end))) return new Pair<Boolean, String>(false, "People can only work on one task at a time");
             }
         }
         return new Pair<Boolean, String>(true, null);
