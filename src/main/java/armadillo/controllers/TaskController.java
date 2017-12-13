@@ -42,7 +42,7 @@ public class TaskController {
 
     public void add(String name, String desc, int hh, int mm, long dateTime) {
         try {
-            Pair<Boolean, String> valid = task_valid(selectedPrerequisiteTasks, selectedPeople, dateTime, hh * 60 * 60 + mm * 60);
+            Pair<Boolean, String> valid = taskValid(selectedPrerequisiteTasks, selectedPeople, dateTime, hh * 60 * 60 + mm * 60);
             if (!valid._1) throw new IllegalArgumentException(valid._2);
             Task t = new Task(name, desc, hh * 60 * 60 + mm * 60, dateTime, database);
             for (Person p : selectedPeople) {
@@ -77,7 +77,7 @@ public class TaskController {
             this._2 = arg2;
         }
     }
-    public static Pair<Boolean, String> task_valid(Set<Task> prereqTasks, Set<Person> people,
+    public static Pair<Boolean, String> taskValid(Set<Task> prereqTasks, Set<Person> people,
             long startDateTime, long effortEstimate) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
 
         LocalDateTime start = LocalDateTime.ofEpochSecond(startDateTime, 0, ZoneOffset.UTC);
