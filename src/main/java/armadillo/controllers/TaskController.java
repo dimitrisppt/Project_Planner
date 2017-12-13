@@ -5,6 +5,7 @@ import armadillo.views.ExceptionAlert;
 import armadillo.views.InvalidInputAlert;
 import armadillo.views.ResourcesPanel;
 import armadillo.views.TaskPanel;
+import armadillo.views.View;
 
 import java.sql.SQLException;
 import java.util.Set;
@@ -52,9 +53,9 @@ public class TaskController {
 //        rp.clearNewResourceText();
 //    }
 
-    public void add(String name, String desc, int hh, int mm) {
+    public void add(String name, String desc, int hh, int mm, long dateTime) {
         try {
-            Task t = new Task(name, desc, hh * 60 * 60 + mm * 60, database);
+            Task t = new Task(name, desc, hh * 60 * 60 + mm * 60, dateTime, database);
             for (Person p : selectedPeople) {
                 t.addPerson(p);
             }
@@ -114,6 +115,17 @@ public class TaskController {
         updateTasks();
     }
 
+    public void updateSchedule(View view) {
+    	 try {
+             TreeSet<Task> tasks = Task.getAllTasks(database);
+             view.updateTasks(tasks);
+         } catch (SQLException | ClassNotFoundException e) {
+             ExceptionAlert ea = new ExceptionAlert(e);
+             ea.showAndWait();
+         }
+         System.out.println("update");
+    }
+    
     public void addSelectedResource(Resource r) {
         selectedResources.add(r);
     }

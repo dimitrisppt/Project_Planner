@@ -20,6 +20,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Set;
 
 public class TaskPanel extends Stage {
@@ -31,12 +33,18 @@ public class TaskPanel extends Stage {
     private Spinner<Integer> spinnerMins;
     private TextField taskField;
     private TextArea descriptionArea;
+    private DatePicker dateSelection;
+    private Spinner<Integer> spinnerTimeHours;
+    private Spinner<Integer> spinnerTimeMins;
 
     public TaskPanel(TaskController taskController) {
         this.taskController = taskController;
 
         Button submit = new Button("Submit");
-        submit.setOnAction(event -> {taskController.add(getTaskName(), getTaskDescription(), getHours(), getMinutes());});
+        submit.setOnAction(event -> {
+        	taskController.add(getTaskName(), getTaskDescription(), getHours(), getMinutes(), getDateTime());
+        	System.out.println("Selected date: " + getDateTime());
+        });
         submit.setId("submitButton");
         submit.setStyle("-fx-font-weight: bold");
 
@@ -69,6 +77,8 @@ public class TaskPanel extends Stage {
 
         Label spinnerLabelHours = new Label("Hours:");
         Label spinnerLabelMins = new Label("Minutes:");
+        
+        
 
         spinnerHours = new Spinner<Integer>();
         int initialValueHours = 1;
@@ -78,13 +88,31 @@ public class TaskPanel extends Stage {
         int initialValueMins = 0;
 
         SpinnerValueFactory<Integer> valueFactoryMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 300, initialValueMins);
-
-
+         
         spinnerHours.setValueFactory(valueFactoryHours);
         spinnerMins.setValueFactory(valueFactoryMins);
         spinnerHours.setMaxWidth(70);
         spinnerMins.setMaxWidth(70);
+        
+        Label dateLabel	= new Label("Select start date:  ");
+        dateSelection = new DatePicker(LocalDate.now());
+        dateSelection.setEditable(false);
+        
+        spinnerTimeHours = new Spinner<Integer>();
+        SpinnerValueFactory<Integer> valueFactorySelectHours = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 0);
+        spinnerTimeHours.setValueFactory(valueFactorySelectHours);
+        
+        spinnerTimeMins = new Spinner<Integer>();
+        SpinnerValueFactory<Integer> valueFactorySelectMins = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0);
+        spinnerTimeMins.setValueFactory(valueFactorySelectMins);
 
+        spinnerTimeHours.setMaxWidth(70);
+        spinnerTimeMins.setMaxWidth(70);
+        
+        Label select = new Label("Select start time (24hr clock):  ");
+        Label select2 = new Label(" : ");
+        select2.setStyle("-fx-font-weight: bold");
+        
         Label effortLabel = new Label("Effort Estimate:");
         effortLabel.setStyle("-fx-font-weight: bold");
         HBox spinnerHBox = new HBox(10);
@@ -94,6 +122,23 @@ public class TaskPanel extends Stage {
         spinnerHBox.getChildren().add(effortLabel);
         spinnerHBox.getChildren().addAll(spinnerLabelHours, spinnerHours);
         spinnerHBox.getChildren().addAll(spinnerLabelMins, spinnerMins);
+        
+        
+        VBox dateTimeVBox = new VBox();
+        dateTimeVBox.setAlignment(Pos.CENTER);
+        dateTimeVBox.setPadding(new Insets(0, 0, 25, 0));
+        dateTimeVBox.setSpacing(5);
+        HBox dateHBox = new	HBox();
+        dateHBox.setAlignment(Pos.CENTER);
+        HBox timeHBox = new HBox();
+        timeHBox.setAlignment(Pos.CENTER);
+        
+        dateHBox.getChildren().addAll(dateLabel, dateSelection);
+        timeHBox.getChildren().addAll(select,spinnerTimeHours, select2, spinnerTimeMins);
+        dateTimeVBox.getChildren().addAll(dateHBox, timeHBox);
+        
+        
+        spinnerHBox.getChildren().addAll(dateTimeVBox);
 
 
         people = FXCollections.observableArrayList ();
@@ -190,6 +235,13 @@ public class TaskPanel extends Stage {
 
     public int getMinutes() {
         return spinnerMins.getValue();
+    }
+    
+    public long getDateTime() {
+    	LocalDate dateTime = dateSelection.getValue();
+    	//return ((long)dateTime.getYear()*100000000 + (long)dateTime.getMonthValue()*1000000 + (long)dateTime.getDayOfMonth()*10000 + (long)spinnerTimeHours.getValue() * 100 + (long)spinnerTimeMins.getValue());
+    	return dateTime.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() + spinnerTimeHours.getValue()*60*60 + spinnerTimeMins.getValue()*60;
+    
     }
 
     public void clear() {
