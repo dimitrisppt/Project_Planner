@@ -32,6 +32,7 @@ public class Task implements Comparable<Task>{
      * @param date_time The starting date and time of the task
      * @throws SQLException If there is an error with the SQL Statement, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
+     * @throws IllegalArgumentException If name is null or the length of the name is less than 1 or greater than 255
      */
     public Task(String name, String description, long effort_estimate, Long date_time, Database database) throws SQLException, ClassNotFoundException {
         if (name == null) throw new IllegalArgumentException("Name cannot be null");
@@ -48,6 +49,7 @@ public class Task implements Comparable<Task>{
      * @param effort_estimate The effort estimate of the task
      * @throws SQLException If there is an error with the SQL Statement, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
+     * @throws IllegalArgumentException If name is null or the length of the name is less than 1 or greater than 255
      */
     public Task(String name, String description, long effort_estimate, Database database) throws SQLException, ClassNotFoundException {
         if (name == null) throw new IllegalArgumentException("Name cannot be null");
@@ -146,6 +148,7 @@ public class Task implements Comparable<Task>{
      * @throws SQLException If there is an error with the SQL Statement, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      * @throws ElementDoesNotExistException If the element does not exist in the database
+     * @throws IllegalArgumentException If name is null or the length of the name is greater than 255
      */
     public void setName(String name) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (name == null) throw new IllegalArgumentException("name cannot be null");
@@ -255,6 +258,7 @@ public class Task implements Comparable<Task>{
      * @throws SQLException If there is an error with the SQL Statement, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      * @throws ElementDoesNotExistException If the element does not exist in the database
+     * @throws IllegalArgumentException If resource is null
      */
     public void addResource(Resource resource) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (resource == null) throw new IllegalArgumentException("resource cannot be null");
@@ -283,6 +287,7 @@ public class Task implements Comparable<Task>{
      * @throws SQLException If there is an error with the SQL Statement, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      * @throws ElementDoesNotExistException If the element does not exist in the database
+     * @throws IllegalArgumentException If person is null
      */
     public void addPerson(Person person) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (person == null) throw new IllegalArgumentException("Person cannot be null");
@@ -311,6 +316,7 @@ public class Task implements Comparable<Task>{
      * @throws SQLException If there is an error with the SQL Statement, should not happen
      * @throws ClassNotFoundException If the SQLite JDBC plugin is not installed
      * @throws ElementDoesNotExistException If the element does not exist in the database
+     * @throws IllegalArgumentException If task is null
      */
     public void addPrerequisiteTask(Task prerequisiteTask) throws SQLException, ClassNotFoundException, ElementDoesNotExistException {
         if (prerequisiteTask == null) throw new IllegalArgumentException("Task cannot be null");
