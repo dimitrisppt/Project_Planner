@@ -68,7 +68,7 @@ public class TaskController {
         update();
     }
 
-    private static class Pair<T, U> {
+    public static class Pair<T, U> {
         public T _1;
         public U _2;
 
