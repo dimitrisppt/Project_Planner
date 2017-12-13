@@ -13,12 +13,22 @@ public class Database {
      */
     public final static String MAIN_URL = "jdbc:sqlite:build/resources/main/tasks.db";
 
+    /**
+     * The URL of the database
+     */
     private String url;
 
+    /**
+     * Creates a database with the default URL
+     */
     public Database() {
         url = MAIN_URL;
     }
 
+    /**
+     * Creates a database with a URL
+     * @param url the JDBC url
+     */
     public Database(String url) {
         this.url = url;
     }
