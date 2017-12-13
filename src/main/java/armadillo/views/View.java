@@ -1,6 +1,9 @@
 package armadillo.views;
 
+import java.util.Date;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Set;
 
 import armadillo.controllers.CreateDatabase;
@@ -169,8 +172,9 @@ public class View extends Application{
                     if(item.getDateTime() == null) {
                     	dateTimeLabel.setText("--/--/---- --:--");
                     }else {
-                    	String text = item.getDateTime().toString();
-                    	dateTimeLabel.setText(text.substring(0, 4) + "/" + text.substring(4,6) + "/" + text.substring(6,8) + "  " + text.substring(8,10) + ":" + text.substring(10,12));                    	
+                    	DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    	Date date = new Date(item.getDateTime()*1000);
+                        dateTimeLabel.setText(format.format(date));
                     }
                     
                 } catch (SQLException | ClassNotFoundException | ElementDoesNotExistException e) {

@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Set;
 
 public class TaskPanel extends Stage {
@@ -238,7 +239,9 @@ public class TaskPanel extends Stage {
     
     public long getDateTime() {
     	LocalDate dateTime = dateSelection.getValue();
-    	return ((long)dateTime.getYear()*100000000 + (long)dateTime.getMonthValue()*1000000 + (long)dateTime.getDayOfMonth()*10000 + (long)spinnerTimeHours.getValue() * 100 + (long)spinnerTimeMins.getValue());
+    	//return ((long)dateTime.getYear()*100000000 + (long)dateTime.getMonthValue()*1000000 + (long)dateTime.getDayOfMonth()*10000 + (long)spinnerTimeHours.getValue() * 100 + (long)spinnerTimeMins.getValue());
+    	return dateTime.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() + spinnerTimeHours.getValue()*60*60 + spinnerTimeMins.getValue()*60;
+    
     }
 
     public void clear() {
