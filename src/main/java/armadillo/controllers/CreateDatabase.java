@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class CreateDatabase {
     public static void createDatabase(String url) throws SQLException, ClassNotFoundException {
         String[] split_url = url.split(":");
-        if (split_url.length != 3) return;
+        if (split_url.length != 3) throw new IllegalArgumentException("URL not valid");
         File file = new File(split_url[2]);
         if (file.exists()) return;
         Database database = new Database(url);
