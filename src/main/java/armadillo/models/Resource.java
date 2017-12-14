@@ -20,6 +20,9 @@ public class Resource implements Comparable<Resource> {
      */
     public final static String TABLE_NAME = "resources";
 
+    /**
+     * The database connection
+     */
     private Database database;
 
     /**
