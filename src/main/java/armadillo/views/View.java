@@ -33,11 +33,19 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-
+/**
+ * The main window of the application which opens on startup
+ */
 public class View extends Application{
 	
+	/**
+	 * The list of tasks that have been placed into the system which are displayed as the schedule
+	 */
 	private ObservableList<Task> tasks;
 	
+	/**
+	 * Main method for application, this calls to create the database and launch the program
+	 */
 	public static void main(String[] args) throws Exception {
 		CreateDatabase.createDatabase(Database.MAIN_URL);
         launch(args);
@@ -45,6 +53,9 @@ public class View extends Application{
 
 
 	@Override
+	/**
+	 * Method which creates and positions elements within the initial UI
+	 */
     public void start(Stage primaryStage) throws Exception{
 
 		Database database = new Database();
@@ -121,12 +132,17 @@ public class View extends Application{
 		
     }
 	
+	/**
+	 * This refreshes the schedule view
+	 * @param allTasks The list of tasks to be displayed as the schedule
+	 */
 	public void updateTasks(Set<Task> allTasks) {
         tasks.setAll(allTasks);
-        System.out.println("Test");
     }
 	
-	
+	/**
+	 * This defines a custom cell to be used in the list component for the schedule
+	 */
 	static class scheduleCell extends ListCell<Task> {
 
         BorderPane borderPane = new BorderPane();
@@ -136,6 +152,11 @@ public class View extends Application{
         Button seeMore = new Button("More details");
         private TaskController taskController;
 
+        /**
+    	 * This initialises the elements contained within each cell of the schedule
+    	 * @param taskController controller used to interact with the model of the task database
+    	 * @param view A reference to the main view window used to call the method which refreshes the schedule
+    	 */
         public scheduleCell(TaskController taskController, View view){
             super();
             
@@ -161,6 +182,11 @@ public class View extends Application{
         }
 
         @Override
+        /**
+    	 * This sets values for each element within the cell whenever a cell update is required
+    	 * @param item The task to be displayed that has been fetched from the database
+    	 * @param empty Whether not the cell should be empty
+    	 */
         public void updateItem(Task item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {

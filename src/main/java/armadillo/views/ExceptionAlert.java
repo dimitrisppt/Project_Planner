@@ -9,8 +9,15 @@ import javafx.scene.layout.Priority;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * The alert window that opens to notify the user that an exception has occured in the program
+ */
 public class ExceptionAlert extends Alert {
-    public ExceptionAlert(Exception e) {
+    /**
+	 * This displays an alert informing the user of the details of an exception which occured
+	 * @param e The exception which has been thrown
+	 */
+	public ExceptionAlert(Exception e) {
         super(AlertType.ERROR);
         this.setTitle("An exception has occured");
         this.setHeaderText("Something unexpected has happened");
