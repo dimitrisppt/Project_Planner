@@ -16,12 +16,35 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * The window in which a user can view, add, and delete people who can be assigned to tasks
+ */
 public class PeoplePanel extends Stage{
+	
+    /**
+	 * Controller used to interact with database 
+	 */
     private final PeopleController peopleController;
+    
+    /**
+	 * This takes user input for the first name of the person
+	 */
     private TextField nameField;
+    
+    /**
+	 * This takes user input for the last name of the person
+	 */
     private TextField surnameField;
+    
+    /**
+	 * List of people currently in the system, which is displayed
+	 */
     private ObservableList<Person> people;
 
+    /**
+	 * Initialises UI components
+	 * @param peopleController Controller used to interact with the database
+	 */
     public PeoplePanel(PeopleController peopleController) {
         this.peopleController = peopleController;
 
@@ -73,32 +96,65 @@ public class PeoplePanel extends Stage{
         this.setScene(dialogScene);
     }
 
+    /**
+	 * Resets the text fields
+	 */
     public void clearText() {
         nameField.clear();
         surnameField.clear();
     }
 
+    /**
+	 * This returns the user input of the persons first name
+	 */
     public String getFirstNameEntry() {
         return nameField.getText();
     }
 
+    /**
+	 * This returns the user input of the persons last name
+	 */
     public String getLastNameEntry() {
         return surnameField.getText();
     }
 
+    /**
+	 * Updates list of people to be displayed
+	 * @param people The set of people to be displayed
+	 */  
     public void updatePeople(Set<Person> people) {
         this.people.setAll(people);
     }
 
-
+    /**
+	 * Defines a custom cell to be used in the list component displaying the people currently in the system
+	 */
     static class peopleCell extends ListCell<Person> {
 
+        /**
+    	 * HBox used for formatting cell
+    	 */
         HBox hbox = new HBox();
+        
+        /**
+    	 * Pane used to hold cell contents
+    	 */
         Pane pane = new Pane();
 
+        /**
+    	 * Button used to delete people
+    	 */
         Button button = new Button("Delete");
+        
+        /**
+    	 * Label used to display persons name
+    	 */
         Label label = new Label("");
 
+        /**
+    	 * Initialises cell UI components
+    	 * @param peopleController Controller used to interact with the database
+    	 */
         public peopleCell(PeopleController peopleController){
 
             super();
@@ -110,6 +166,11 @@ public class PeoplePanel extends Stage{
         }
 
         @Override
+        /**
+    	 * This sets values for each element within the cell whenever a cell update is required
+    	 * @param item The people to be displayed that has been fetched from the database
+    	 * @param empty Whether not the cell should be empty
+    	 */
         public void updateItem(Person item, boolean empty) {
 
             super.updateItem(item, empty);

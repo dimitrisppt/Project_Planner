@@ -24,19 +24,70 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Set;
 
+/**
+ * The window in which a user can input details used to create and add a new task to the database
+ */
 public class TaskPanel extends Stage {
-    private final TaskController taskController;
-    private ObservableList<Resource> resources;
-    private ObservableList<Person> people;
-    private ObservableList<Task> tasks;
-    private Spinner<Integer> spinnerHours;
-    private Spinner<Integer> spinnerMins;
+    
+	/**
+	 * A controller used to interact with teh database of tasks
+	 */
+	private final TaskController taskController;
+   
+	/**
+	 * A list of resources in the database
+	 */
+	private ObservableList<Resource> resources;
+    
+	/**
+	 * A list of people in the database
+	 */
+	private ObservableList<Person> people;
+    
+	/**
+	 * A list of tasks in the database
+	 */
+	private ObservableList<Task> tasks;
+    
+	/**
+	 * Spinner used to input the effort estimate of a task
+	 */
+	private Spinner<Integer> spinnerHours;
+    
+	/**
+	 * Spinner used to input the effort estimate of a task
+	 */
+	private Spinner<Integer> spinnerMins;
+	
+	/**
+	 * This takes user input for the name of the task
+	 */
     private TextField taskField;
+    
+    /**
+	 * This takes user input for the description of the task
+	 */
     private TextArea descriptionArea;
+    
+    /**
+	 * This allows a user to select a date on which a task should be started
+	 */
     private DatePicker dateSelection;
+    
+    /**
+	 * Spinner used to input the start time of a task
+	 */
     private Spinner<Integer> spinnerTimeHours;
+    
+    /**
+	 * Spinner used to input the start time of a task
+	 */
     private Spinner<Integer> spinnerTimeMins;
 
+    /**
+	 * This initialises UI elements
+	 * @param taskController Controller used to interact with the database
+	 */
     public TaskPanel(TaskController taskController) {
         this.taskController = taskController;
 
@@ -209,41 +260,69 @@ public class TaskPanel extends Stage {
 
     }
 
+    /**
+	 * Updates list of resources displayed
+	 * @param allResources The set of resources to be displayed
+	 */
     public void updateResources(Set<Resource> allResources) {
         resources.setAll(allResources);
     }
 
+    /**
+	 * Updates list of people displayed
+	 * @param allPeople The set of people to be displayed
+	 */
     public void updatePeople(Set<Person> allPeople) {
         people.setAll(allPeople);
     }
 
+    /**
+	 * Updates list of tasks displayed
+	 * @param allTasks The set of tasks to be displayed
+	 */
     public void updateTasks(Set<Task> allTasks) {
         tasks.setAll(allTasks);
     }
 
+    /**
+	 * This returns the user input pertaining to the name of the task
+	 */
     public String getTaskName() {
         return taskField.getText();
     }
 
+    /**
+	 * This returns the user input pertaining to the description of the task
+	 */
     public String getTaskDescription() {
         return descriptionArea.getText();
     }
 
+    /**
+	 * This returns the user input pertaining to the hours of the effort estimate
+	 */
     public int getHours() {
         return spinnerHours.getValue();
     }
 
+    /**
+	 * This returns the user input pertaining to the minutes of the effort estimate
+	 */
     public int getMinutes() {
         return spinnerMins.getValue();
     }
 
+    /**
+	 * This returns the user input pertaining to the starting date and time of the task, converted to seconds from the epoch
+	 */
     public long getDateTime() {
     	LocalDate dateTime = dateSelection.getValue();
-    	//return ((long)dateTime.getYear()*100000000 + (long)dateTime.getMonthValue()*1000000 + (long)dateTime.getDayOfMonth()*10000 + (long)spinnerTimeHours.getValue() * 100 + (long)spinnerTimeMins.getValue());
     	return dateTime.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() + spinnerTimeHours.getValue()*60*60 + spinnerTimeMins.getValue()*60;
-
     }
 
+    /**
+	 * Resets input fields
+	 */
     public void clear() {
         taskField.clear();
         descriptionArea.clear();
@@ -254,14 +333,35 @@ public class TaskPanel extends Stage {
         tasks.clear();
     }
 
+    /**
+	 * This defines a custom cell to be used in the list component displaying the previously entered tasks
+	 */
     static class taskCell extends ListCell<Task> {
 
-
+    	/**
+    	 * Controller used to interact with the database
+    	 */
         private TaskController taskController;
+        
+        /**
+    	 * Checkbox used to mark a task as a prerequisite
+    	 */
         private CheckBox checkbox;
+        
+        /**
+    	 * Button used to delete a task
+    	 */
         private Button button;
+        
+        /**
+    	 * Label to display task name
+    	 */
         private Label label;
 
+        /**
+    	 * This initialises the elements within the cell
+    	 * @param taskController controller used to interact with the database
+    	 */
         public taskCell(TaskController taskController){
             // super();
             this.taskController = taskController;
@@ -273,6 +373,11 @@ public class TaskPanel extends Stage {
         }
 
         @Override
+        /**
+    	 * This sets values for each element within the cell whenever a cell update is required
+    	 * @param item The task to be displayed that has been fetched from the database
+    	 * @param empty Whether not the cell should be empty
+    	 */
         public void updateItem(Task item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {
@@ -304,15 +409,34 @@ public class TaskPanel extends Stage {
         }
     }
 
+    /**
+	 * This defines a custom cell to be used in the list component displaying the people who can be assigned to a task
+	 */
     static class peopleCell extends ListCell<Person> {
 
+        /**
+    	 * Controller used to interact with database
+    	 */
         private final TaskController taskController;
+        
+        /**
+    	 * Checkbox used to mark a person as being assigned to a task
+    	 */
         private CheckBox checkbox;
 
+        /**
+    	 * Assigns controller
+    	 * @param taskController controller used
+    	 */
         public peopleCell(TaskController taskController) {
             this.taskController = taskController;
         }
-
+        
+        /**
+    	 * This sets values for each element within the cell whenever a cell update is required
+    	 * @param item The person to be displayed that has been fetched from the database
+    	 * @param empty Whether not the cell should be empty
+    	 */
         public void updateItem(Person item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {
@@ -339,16 +463,34 @@ public class TaskPanel extends Stage {
         }
     }
 
-
+    /**
+	 * Defines a custom cell to be used in the list component displaying the resources which can be assigned to a task
+	 */
     static class resourcesCell extends ListCell<Resource> {
 
+        /**
+    	 * Controller used to interact with the database
+    	 */
         private final TaskController taskController;
+        
+        /**
+    	 * Checkbox used to mark a resource as being assigned to a task
+    	 */
         private CheckBox checkbox;
 
+        /**
+    	 * Assigns controller
+    	 * @param taskController Controller to be used
+    	 */
         public resourcesCell(TaskController taskController) {
             this.taskController = taskController;
         }
 
+        /**
+    	 * This sets values for each element within the cell whenever a cell update is required
+    	 * @param item The resource to be displayed that has been fetched from the database
+    	 * @param empty Whether not the cell should be empty
+    	 */
         public void updateItem(Resource item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {

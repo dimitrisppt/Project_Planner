@@ -17,11 +17,30 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.Set;
 
+/**
+ * The window in which a user can view, add, and delete resources which can be used in tasks
+ */
 public class ResourcesPanel extends Stage {
-    private final ResourceController resourceController;
+    
+    /**
+	 * Controller used to interact with database
+	 */
+	private final ResourceController resourceController;
+	
+    /**
+	 * List of resources currently in the system, which is displayed
+	 */
     private ObservableList<Resource> resources;
+    
+    /**
+	 * This takes user input for the name of the resource
+	 */
     private TextField resourceField;
 
+    /**
+	 * This initialises UI elements within the window
+	 * @param resourceController The controller used to interact with the database
+	 */
     public ResourcesPanel(ResourceController resourceController) {
         this.resourceController = resourceController;
 
@@ -62,24 +81,52 @@ public class ResourcesPanel extends Stage {
         this.setScene(dialogScene);
     }
 
+    /**
+	 * Updates list of resources to be displayed
+	 * @param resources The set of resources to be displayed
+	 */
     public void updateResources(Set<Resource> resources) {
         this.resources.setAll(resources);
     }
 
+    /**
+	 * This returns the user input for the name of the resource
+	 */
     public String getNewResourceText() {
         return resourceField.getText();
     }
 
+    /**
+	 * Resets the text field
+	 */
     public void clearNewResourceText() {
         resourceField.clear();
     }
 
+    /**
+	 * Defines a custom cell to be used in the list component displaying the resources currently available
+	 */
     static class resourcesCell extends ListCell<Resource> {
 
+        /**
+    	 * HBox used to format the cell contents
+    	 */
         private HBox hbox = new HBox();
+        
+        /**
+    	 * Button used to delete resources from the database
+    	 */
         private Button button = new Button("Delete");
+        
+        /**
+    	 * Label used to display resource name
+    	 */
         private Label label = new Label("");
 
+        /**
+    	 * Initialises UI elements
+    	 * @param resourceController Controller used to interact with the database
+    	 */
         public resourcesCell(ResourceController resourceController){
 
             super();
@@ -89,6 +136,11 @@ public class ResourcesPanel extends Stage {
         }
 
         @Override
+        /**
+    	 * This sets values for each element within the cell whenever a cell update is required
+    	 * @param item The resource to be displayed that has been fetched from the database
+    	 * @param empty Whether not the cell should be empty
+    	 */
         public void updateItem(Resource item, boolean empty) {
 
             super.updateItem(item, empty);
